@@ -6,38 +6,70 @@ use Getopt::Long qw/GetOptions/;
 use List::Util qw/sum/;
 use Number::WithError;
 
-our $precision       = 0.10;
-our $abs_precision   = 0;
+sub usage {
+  my $msg = shift;
+  print "$msg\n\n" if defined $msg;
+
+  print <<USAGE;
+Usage: $0 [options] -- command with arguments
+
+Options:
+ -p=X
+ --precision=X     Set the target precision (default: 0.10=10%)
+                   Set to 0 to disable.
+ -a=x
+ --absprecision=X  Set the target absolute precision (default: 0)
+                   Set to 0 to disable.
+
+ -v|--verbose      Increase verbosity. Increases up to three times.
+ -i=X|--initial=X  Set number of initial timing runs (default: 10)
+                   Increase, not decrease this number if possible.
+ -m=X|--maxiter=X  Set a hard maximum number of iterations (default:100)
+                   If this hard limit is hit, the precision is off.
+ --raw             Set raw output mode. Only the final count will be
+                   printed to stdout.
+ -s|--std          Use the standard deviation instead of the MAD as a
+                   measure of variability.
+USAGE
+  exit(1);
+}
+
+
+our $RelPrecision    = 0.10;
+our $AbsPrecision    = 0;
 our $V               = 0;
-our $initial_timings = 10; # more or less arbitrary but can't be much smaller than 6-7
-our $dryrun_cmd      = '';
-our $max_iter        = 100;
-our $raw             = 0;
-our $use_std_dev     = 0;
+our $InitialTimings  = 10; # more or less arbitrary but can't be much smaller than 6-7
+our $DryRunCmd       = '';
+our $MaxIter         = 100;
+our $RawOutput       = 0;
+our $UseStdDeviation = 0;
 
 Getopt::Long::Configure('bundling');
 GetOptions(
-  'p|precision=f'    => \$precision,
-  'a|absprecision=f' => \$abs_precision,
+  'h|help            => \&usage,
+  'p|precision=f'    => \$RelPrecision,
+  'a|absprecision=f' => \$AbsPrecision,
   'v|verbose+'       => \$V,
-  'i|initial=i'      => \$initial_timings,
-  'm|maxiter=i'      => \$max_iter,
-  'raw'              => \$raw,
-  's|std'            => \$use_std_dev,
+  'i|initial=i'      => \$InitialTimings,
+  'm|maxiter=i'      => \$MaxIter,
+  'raw'              => \$RawOutput,
+  's|std'            => \$UseStdDeviation,
 );
 
-if ($raw) {
+if ($RawOutput) {
   $V = 0;
 }
 
-if ($precision <= 0 and $abs_precision <= 0) {
+if ($RelPrecision <= 0 and $AbsPrecision <= 0) {
   die "Need either --precision (-p) or --absprecision (-a) set to positive value\n";
 }
-elsif ($initial_timings < 6) {
+elsif ($InitialTimings < 6) {
   warn "Number of initial timings is VERY low. Result will be unreliable.\n";
 }
 
-my @CMD = @ARGV or die;
+@ARGV or usage();
+
+my @CMD = @ARGV;
 
 
 
@@ -60,7 +92,7 @@ $result = $result - $dry_result;
 my $mean = $result->raw_number;
 my $sigma = $result->raw_error->[0];
 
-if (not $raw) {
+if (not $RawOutput) {
   print "Ran " . scalar(@$timings) . " iterations of the command.\n";
   print "Rounded run time per iteration: $result" . sprintf(" (%.1f%%)\n", $sigma/$mean*100);
   print "Raw:                            $mean +/- $sigma\n" if $V;
@@ -73,23 +105,24 @@ sub run_timing {
   my $cmd = shift;
   my $dry = shift;
 
+  # for overriding in case of dry-run mode
   local $V = $V;
-  local $initial_timings = $initial_timings;
-  local $abs_precision = $abs_precision;
-  local $precision = $precision;
-  local $max_iter = $max_iter;
+  local $InitialTimings = $InitialTimings;
+  local $AbsPrecision = $AbsPrecision;
+  local $RelPrecision = $RelPrecision;
+  local $MaxIter = $MaxIter;
 
   if ($dry) {
     $V--; $V = 0 if $V < 0;
-    $initial_timings *= 5;
-    $abs_precision = 0;
-    $precision /= 2;
-    $max_iter *= 10;
+    $InitialTimings *= 5;
+    $AbsPrecision    = 0;
+    $RelPrecision   /= 2;
+    $MaxIter        *= 10;
   }
 
   my @timings;
-  print "Running $initial_timings initial timings...\n" if $V;
-  foreach (1..$initial_timings) {
+  print "Running $InitialTimings initial timings...\n" if $V;
+  foreach (1..$InitialTimings) {
     print "Running timing $_...\n" if $V > 1;
     push @timings, ($dry ? run_dry($cmd) : run($cmd));
   }
@@ -105,21 +138,21 @@ sub run_timing {
 
     # stop condition
     my $need_iter = 0;
-    if ($precision > 0) {
+    if ($RelPrecision > 0) {
       my $rel = $sigma/$mean;
-      print "Reached relative precision $rel (neeed $precision).\n" if $V > 1;
-      $need_iter++ if $rel > $precision;
+      print "Reached relative precision $rel (neeed $RelPrecision).\n" if $V > 1;
+      $need_iter++ if $rel > $RelPrecision;
     }
-    if ($abs_precision > 0) {
-      print "Reached absolute precision $sigma (neeed $abs_precision).\n" if $V > 1;
-      $need_iter++ if $sigma > $abs_precision;
+    if ($AbsPrecision > 0) {
+      print "Reached absolute precision $sigma (neeed $AbsPrecision).\n" if $V > 1;
+      $need_iter++ if $sigma > $AbsPrecision;
     }
-    last if not $need_iter or @timings == $max_iter;
+    last if not $need_iter or @timings == $MaxIter;
 
     push @timings, ($dry ? run_dry($cmd) : run($cmd));
   }
 
-  if (@timings == $max_iter and not $dry) {
+  if (@timings == $MaxIter and not $dry) {
     print "Reached maximum number of iterations. Stopping. Precision not reached.\n";
   }
 
@@ -192,7 +225,7 @@ sub mean_dev {
   my $data = shift;
 
   my $s;
-  if ($use_std_dev) {
+  if ($UseStdDeviation) {
     $s = std_dev($data);
   }
   else {

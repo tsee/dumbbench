@@ -46,7 +46,7 @@ our $UseStdDeviation = 0;
 
 Getopt::Long::Configure('bundling');
 GetOptions(
-  'h|help            => \&usage,
+  'h|help'           => \&usage,
   'p|precision=f'    => \$RelPrecision,
   'a|absprecision=f' => \$AbsPrecision,
   'v|verbose+'       => \$V,

@@ -4,6 +4,8 @@ use warnings;
 use Carp ();
 use Time::HiRes ();
 
+our $VERSION = '0.01';
+
 require Dumbbench::Result;
 require Dumbbench::Stats;
 require Dumbbench::Instance;
@@ -176,3 +178,35 @@ sub dry_run {
 
 
 1;
+
+__END__
+
+=head1 NAME
+
+Dumbbench - Perl extension more reliable benchmarking
+
+=head1 SYNOPSIS
+
+  use Dumbbench;
+
+=head1 DESCRIPTION
+
+=head1 SEE ALSO
+
+L<Benchmark>
+
+L<http://en.wikipedia.org/wiki/Median_absolute_deviation>
+
+=head1 AUTHOR
+
+Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
+
+=head1 COPYRIGHT AND LICENSE
+
+Copyright (C) 2010 by Steffen Mueller
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself, either Perl version 5.8.1 or,
+at your option, any later version of Perl 5 you may have available.
+
+=cut

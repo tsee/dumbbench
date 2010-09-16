@@ -65,13 +65,16 @@ my @CMD = @ARGV or usage;
 
 if ($PlotTimings) {
   eval "use SOOT";
-  die "Timing distribution plots require the SOOT module" if $@;  
-  SOOT::Init(1);
+  die "Timing distribution plots require the SOOT module" if $@;
+  require Capture::Tiny;
+  my @discarded = Capture::Tiny::capture(sub {
+    SOOT::Init(1);
+  });
 }
 
 my $bench = Dumbbench->new(
-  target_rel_precision => $AbsPrecision,
-  target_abs_precision => $RelPrecision,
+  target_rel_precision => $RelPrecision,
+  target_abs_precision => $AbsPrecision,
   initial_runs         => $InitialTimings,
   max_iterations       => $MaxIter,
   variability_measure  => ($UseStdDeviation ? 'std_dev' : 'mad_dev' ),
@@ -79,7 +82,7 @@ my $bench = Dumbbench->new(
 
 $bench->add_instances(
   Dumbbench::Instance::Cmd->new(
-    name => 'cli',
+    name    => 'cli',
     command => \@CMD,
     (defined $DryRunCmd ? (dry_run_command => $DryRunCmd) : ()),
   ),
@@ -87,22 +90,10 @@ $bench->add_instances(
 
 $bench->run;
 
-foreach my $instance ($bench->instances) {
-  my $result = $instance->result;
-  
-  if (not $RawOutput) {
-    my $mean = $result->raw_number;
-    my $sigma = $result->raw_error->[0];
-    print "Ran " . scalar(@{$instance->timings}) . " iterations of the command.\n";
-    print "Rejected " . (scalar(@{$instance->timings})-$result->nsamples) . " samples as outliers.\n";
-    print "Rounded run time per iteration: $result" . sprintf(" (%.1f%%)\n", $sigma/$mean*100);
-    print "Raw:                            $mean +/- $sigma\n" if $V;
-  }
-  else {
-    print $result, "\n";
-  }
+$bench->report;
 
-  if ($PlotTimings) {
+if ($PlotTimings) {
+  foreach my $instance ($bench->instances) {
     foreach my $src (qw(dry_timings_as_histogram timings_as_histogram)) {
       my $hist = $instance->$src;
       if (defined $hist) {
@@ -114,9 +105,7 @@ foreach my $instance ($bench->instances) {
       }
     }
   }
-}
 
-if ($PlotTimings) {
   defined($SOOT::gApplication) && 1; # silence warnings;
   $SOOT::gApplication->Run();
 }

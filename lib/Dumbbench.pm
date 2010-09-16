@@ -416,8 +416,8 @@ Like the median, it is quite robust against outliers.
 =item 3)
 
 We use the median and MAD to remove the tails of our distribution.
-All timings that deviate by more than C<$X> times the MAD from the
-median are rejected. This measure should cut outliers without introducing
+All timings that deviate from the median by more than C<$X> times the MAD
+are rejected. This measure should cut outliers without introducing
 much bias both in symmetric and asymmetric source distributions.
 
 An alternative would be to use an ordinary truncated mean (that is

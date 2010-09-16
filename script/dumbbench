@@ -38,10 +38,11 @@ our $RelPrecision    = 0.10;
 our $AbsPrecision    = 0;
 our $V               = 0;
 our $InitialTimings  = 10; # more or less arbitrary but can't be much smaller than 6-7
-our $DryRunCmd       = '';
+our $DryRunCmd;
 our $MaxIter         = 1000;
 our $RawOutput       = 0;
 our $UseStdDeviation = 0;
+our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT 
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -54,6 +55,7 @@ GetOptions(
   'raw'              => \$RawOutput,
   's|std'            => \$UseStdDeviation,
   'd|dryrun=s'       => \$DryRunCmd,
+  'plot_timings'     => \$PlotTimings,
 );
 
 if ($RawOutput) {
@@ -93,6 +95,22 @@ foreach my $instance ($bench->instances) {
   else {
     print $result, "\n";
   }
-  
+
+  if ($PlotTimings) {
+    foreach my $src (qw(dry_timings_as_histogram timings_as_histogram)) {
+      my $hist = $instance->$src;
+      if (defined $hist) {
+        my $cv = TCanvas->new->keep;
+        $cv->cd;
+        $hist->Draw;
+        $hist->keep;
+        $cv->Update;
+      }
+    }
+  }
 }
 
+if ($PlotTimings) {
+  defined($SOOT::gApplication) && 1; # silence warnings;
+  $SOOT::gApplication->Run();
+}

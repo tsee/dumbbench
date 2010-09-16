@@ -46,12 +46,14 @@ sub single_dry_run {
   }
   else {
     @cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
-    if (@cmd and $cmd[0] =~ /\bperl(?:\d+\.\d+\.\d+)?/) {
+    if (@cmd and $cmd[0] =~ /(?:^|\b)perl(?:\d+\.\d+\.\d+)?/) {
       @cmd = ($cmd[0], '-e', '1');
     }
   }
   if (!@cmd) {
-    @cmd = ("");
+    #@cmd = ("");
+    # FIXME For lack of a better dry run test, we always use perl for now
+    @cmd = ($^W, qw(-e 1));
   }
   my $start = Time::HiRes::time();
   system({$cmd[0]} @cmd);

@@ -38,6 +38,7 @@ sub new {
       variability_measure  => 'mad',
       instances            => [],
       started              => 0,
+      outlier_rejection    => 2.5,
       @_,
     } => $class;
   }
@@ -81,10 +82,27 @@ sub instances {
 
 sub run {
   my $self = shift;
+  Carp::croak("Can't re-run same benchmark instance") if $self->started;
+  $self->dry_run_timings;
+  $self->run_timings;
+}
+
+sub run_timings {
+  my $self = shift;
   $self->{started} = 1;
   foreach my $instance ($self->instances) {
-    next if $instance->dry_result;
+    next if $instance->result;
     $self->_run($instance);
+  }
+}
+
+sub dry_run_timings {
+  my $self = shift;
+  $self->{started} = 1;
+
+  foreach my $instance ($self->instances) {
+    next if $instance->dry_result;
+    $self->_run($instance, 'dry');
   }
 }
 
@@ -111,9 +129,7 @@ sub _run {
   print "Running initial timing for warming up the cache...\n" if $V;
   if ($dry) {
     # be generous, this is fast
-    $instance->single_dry_run();
-    $instance->single_dry_run();
-    $instance->single_dry_run();
+    $instance->single_dry_run() for 1..3;
   }
   else {
     $instance->single_run();
@@ -157,24 +173,15 @@ sub _run {
     print "Reached maximum number of iterations. Stopping. Precision not reached.\n";
   }
 
-  $instance->{timings} = \@timings;
+  my $result = Dumbbench::Result->new(timing => $mean, uncertainty => $sigma);
   if ($dry) {
-    $instance->dry_result(Dumbbench::Result->new($mean, $sigma));
+    $instance->{dry_timings} = \@timings;
+    $instance->dry_result($result);
   }
   else {
-    my $result = Dumbbench::Result->new(timing => $mean, uncertainty => $sigma);
+    $instance->{timings} = \@timings;
     $result -= $instance->dry_result if defined $instance->dry_result;
     $instance->result($result);
-  }
-}
-
-sub dry_run {
-  my $self = shift;
-  $self->{started} = 1;
-
-  foreach my $instance ($self->instances) {
-    next if $instance->dry_result;
-    $self->_run($instance, 'dry');
   }
 }
 

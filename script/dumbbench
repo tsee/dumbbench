@@ -19,9 +19,8 @@ Options:
  -a=x
  --absprecision=X  Set the target absolute precision (default: 0)
                    Set to 0 to disable.
-
  -v|--verbose      Increase verbosity. Increases up to three times.
- -i=X|--initial=X  Set number of initial timing runs (default: 10)
+ -i=X|--initial=X  Set number of initial timing runs (default: 20)
                    Increase, not decrease this number if possible.
  -m=X|--maxiter=X  Set a hard maximum number of iterations (default:1000)
                    If this hard limit is hit, the precision is off.
@@ -37,7 +36,7 @@ USAGE
 our $RelPrecision    = 0.10;
 our $AbsPrecision    = 0;
 our $V               = 0;
-our $InitialTimings  = 10; # more or less arbitrary but can't be much smaller than 6-7
+our $InitialTimings  = 20; # more or less arbitrary but can't be much smaller than 6-7 on fundamental grounds
 our $DryRunCmd;
 our $MaxIter         = 1000;
 our $RawOutput       = 0;
@@ -64,12 +63,18 @@ if ($RawOutput) {
 
 my @CMD = @ARGV or usage;
 
+if ($PlotTimings) {
+  eval "use SOOT";
+  die "Timing distribution plots require the SOOT module" if $@;  
+  SOOT::Init(1);
+}
+
 my $bench = Dumbbench->new(
   target_rel_precision => $AbsPrecision,
   target_abs_precision => $RelPrecision,
-  initial_runs => $InitialTimings,
-  max_iterations => $MaxIter,
-  variability_measure => ($UseStdDeviation ? 'std_dev' : 'mad_dev' ),
+  initial_runs         => $InitialTimings,
+  max_iterations       => $MaxIter,
+  variability_measure  => ($UseStdDeviation ? 'std_dev' : 'mad_dev' ),
 );
 
 $bench->add_instances(

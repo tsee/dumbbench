@@ -226,16 +226,18 @@ Thus cutting the tails won't blow up the bias too strongly (hopefully).
 }
 
 sub report {
-  foreach my $instance ($bench->instances) {
+  my $self = shift;
+  my $raw = shift;
+  foreach my $instance ($self->instances) {
     my $result = $instance->result;
     
-    if (not $RawOutput) {
+    if (not $raw) {
       my $mean = $result->raw_number;
       my $sigma = $result->raw_error->[0];
       print "Ran " . scalar(@{$instance->timings}) . " iterations of the command.\n";
       print "Rejected " . (scalar(@{$instance->timings})-$result->nsamples) . " samples as outliers.\n";
       print "Rounded run time per iteration: $result" . sprintf(" (%.1f%%)\n", $sigma/$mean*100);
-      print "Raw:                            $mean +/- $sigma\n" if $V;
+      print "Raw:                            $mean +/- $sigma\n" if $self->verbosity;
     }
     else {
       print $result, "\n";

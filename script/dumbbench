@@ -90,7 +90,7 @@ $bench->add_instances(
 
 $bench->run;
 
-$bench->report;
+$bench->report($RawOutput);
 
 if ($PlotTimings) {
   foreach my $instance ($bench->instances) {

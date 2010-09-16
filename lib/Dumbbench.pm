@@ -20,6 +20,7 @@ use Class::XSAccessor {
     max_iterations
     variability_measure
     started
+    outlier_rejection
   )],
   accessors => [qw(verbosity)],
 };
@@ -148,10 +149,24 @@ sub _run {
   my $sigma;
   my $mean;
 
+  my $n_good = 0;
   my $variability_measure = $self->variability_measure;
   while (1) {
-    $sigma = $stats->$variability_measure() / sqrt(scalar(@timings));
+    $sigma = $stats->$variability_measure();# / sqrt(scalar(@timings));
     $mean  = $stats->mean();
+    my $median = $stats->median();
+    my $outlier_rejection = $self->outlier_rejection;
+    my @t;
+    if ($outlier_rejection) {
+      @t = grep {abs($_-$median) < $outlier_rejection*$sigma} @timings;
+    }
+    else {
+      @t = @timings; # doh
+    }
+    $n_good = @t;
+    my $new_stats = Dumbbench::Stats->new(data => \@t);
+    $sigma = $new_stats->$variability_measure() / sqrt(scalar(@t));
+    $mean = $new_stats->mean();
 
     # stop condition
     my $need_iter = 0;
@@ -164,6 +179,9 @@ sub _run {
       print "Reached absolute precision $sigma (neeed $abs_precision).\n" if $V > 1;
       $need_iter++ if $sigma > $abs_precision;
     }
+    if ($n_good < $initial_timings) {
+      $need_iter++;
+    }
     last if not $need_iter or @timings == $max_iterations;
 
     push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run());
@@ -173,7 +191,12 @@ sub _run {
     print "Reached maximum number of iterations. Stopping. Precision not reached.\n";
   }
 
-  my $result = Dumbbench::Result->new(timing => $mean, uncertainty => $sigma);
+  my $result = Dumbbench::Result->new(
+    timing      => $mean,
+    uncertainty => $sigma,
+    nsamples    => $n_good,
+  );
+
   if ($dry) {
     $instance->{dry_timings} = \@timings;
     $instance->dry_result($result);

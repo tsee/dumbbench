@@ -5,7 +5,7 @@ use List::Util 'sum';
 
 use Class::XSAccessor {
   constructor => 'new',
-  accessor => [qw/data/],
+  accessors => [qw/data/],
 };
 
 sub mean {

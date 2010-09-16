@@ -34,7 +34,7 @@ sub new {
       target_rel_precision => 0.10,
       target_abs_precision => 0,
       intial_runs          => 10,
-      max_iterations       => 100,
+      max_iterations       => 10000,
       variability_measure  => 'mad',
       instances            => [],
       started              => 0,
@@ -81,8 +81,11 @@ sub instances {
 
 sub run {
   my $self = shift;
-  $self->started(1);
-  
+  $self->{started} = 1;
+  foreach my $instance ($self->instances) {
+    next if $instance->dry_result;
+    $self->_run($instance);
+  }
 }
 
 sub _run {
@@ -91,7 +94,7 @@ sub _run {
   my $dry = shift;
 
   # for overriding in case of dry-run mode
-  my $V = $self->verbosity;
+  my $V = $self->verbosity || 0;
   my $initial_timings = $self->initial_runs;
   my $abs_precision = $self->target_abs_precision;
   my $rel_precision = $self->target_rel_precision;
@@ -108,19 +111,19 @@ sub _run {
   print "Running initial timing for warming up the cache...\n" if $V;
   if ($dry) {
     # be generous, this is fast
-    $instance->run_dry();
-    $instance->run_dry();
-    $instance->run_dry();
+    $instance->single_dry_run();
+    $instance->single_dry_run();
+    $instance->single_dry_run();
   }
   else {
-    $instance->run();
+    $instance->single_run();
   }
   
   my @timings;
   print "Running $initial_timings initial timings...\n" if $V;
   foreach (1..$initial_timings) {
     print "Running timing $_...\n" if $V > 1;
-    push @timings, ($dry ? $instance->run_dry() : $instance->run());
+    push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run());
   }
 
   print "Iterating until target precision reached...\n" if $V;
@@ -147,7 +150,7 @@ sub _run {
     }
     last if not $need_iter or @timings == $max_iterations;
 
-    push @timings, ($dry ? $instance->run_dry() : $instance->run());
+    push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run());
   }
 
   if (@timings == $max_iterations and not $dry) {
@@ -159,20 +162,19 @@ sub _run {
     $instance->dry_result(Dumbbench::Result->new($mean, $sigma));
   }
   else {
-    my $result = Dumbbench::Result->new($mean, $sigma);
-    $result -= $self->dry_result if defined $self->dry_result;
+    my $result = Dumbbench::Result->new(timing => $mean, uncertainty => $sigma);
+    $result -= $instance->dry_result if defined $instance->dry_result;
     $instance->result($result);
   }
 }
 
 sub dry_run {
   my $self = shift;
-  $self->started(1);
+  $self->{started} = 1;
 
   foreach my $instance ($self->instances) {
     next if $instance->dry_result;
-
-    
+    $self->_run($instance, 'dry');
   }
 }
 

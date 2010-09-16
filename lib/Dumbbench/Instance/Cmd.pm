@@ -10,6 +10,7 @@ use parent 'Dumbbench::Instance';
 use Class::XSAccessor {
   getters => [qw(
     command
+    dry_run_command
   )],
 };
 
@@ -38,11 +39,18 @@ sub single_run {
 sub single_dry_run {
   my $self = shift;
 
-  my @cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
-  if (@cmd and $cmd[0] =~ /\bperl(?:\d+\.\d+\.\d+)?/) {
-    @cmd = ($cmd[0], '-e', '1');
+  my @cmd;
+  
+  if (defined $self->{dry_run_command}) {
+    @cmd = (ref($self->{dry_run_command}) ? @{$self->{dry_run_command}} : ($self->{dry_run_command}));
   }
   else {
+    @cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
+    if (@cmd and $cmd[0] =~ /\bperl(?:\d+\.\d+\.\d+)?/) {
+      @cmd = ($cmd[0], '-e', '1');
+    }
+  }
+  if (!@cmd) {
     @cmd = ("");
   }
   my $start = Time::HiRes::time();

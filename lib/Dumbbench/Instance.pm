@@ -8,6 +8,7 @@ require Dumbbench::Instance::Cmd;
 use Class::XSAccessor {
   constructor => 'new',
   accessors => [qw(
+    name
     dry_result
     result
   )],

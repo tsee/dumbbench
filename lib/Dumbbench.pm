@@ -149,6 +149,22 @@ sub _run {
   my $sigma;
   my $mean;
 
+=for developers
+
+My mental model for the distribution was Gauss+outliers.
+Indeed, there's some Gaussian-like component to it, but at least at this low a level wrt. time span, systematic effects clearly dominate.
+If my expectation had been correct, the following algorithm should produce a reasonable EV +/- uncertainty:
+1) Calc. median of the whole distribution.
+2) Calculate the median-absolute deviation from the whole distribution (MAD, see wikipedia). It needs rescaling to become a measure of variability that is robust against outliers.
+(The MAD will be our initial guess for a "sigma")
+3) Reject the samples that are outside $median +/- $n*$MAD.
+I was expecting several high outliers but few lows. An ordinary truncated mean or the like would be unsuitable for removing the outliers in such a case since you'd get a significant upward bias of your EV.
+By using the median as the initial guess, we keep the initial bias to a minimum. The MAD will be similarly unaffected by outliers AND the asymmetry.
+Thus cutting the tails won't blow up the bias too strongly (hopefully).
+4) Calculate mean & MAD/sqrt($n) of the remaining distribution. These are our EV and uncertainty on the mean.
+
+=cut
+
   my $n_good = 0;
   my $variability_measure = $self->variability_measure;
   while (1) {

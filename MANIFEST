@@ -1,0 +1,15 @@
+Changes
+lib/Dumbbench.pm
+lib/Dumbbench/Instance.pm
+lib/Dumbbench/Instance/Cmd.pm
+lib/Dumbbench/Instance/PerlEval.pm
+lib/Dumbbench/Instance/PerlSub.pm
+lib/Dumbbench/Result.pm
+lib/Dumbbench/Stats.pm
+Makefile.PL
+MANIFEST			This list of files
+script/dumbbench
+t/000_load.t
+t/010_stats.t
+xt/at_000_eval_vs_sub.t
+xt/at_000_external_vs_eval.t

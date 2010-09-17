@@ -33,7 +33,7 @@ use constant TOO_SMALL => 1.e-4;
 
 =head1 NAME
 
-Dumbbench::Instance::PerlEval - Benchmarks an string of Perl code
+Dumbbench::Instance::PerlEval - Benchmarks a string of Perl code
 
 =head1 SYNOPSIS
 

@@ -279,8 +279,10 @@ As a module:
   $bench->add_instances(
     Dumbbench::Instance::Cmd->new(command => [qw(perl -e 'something')]), 
     Dumbbench::Instance::PerlEval->new(code => 'for(1..1e7){something}'),
+    Dumbbench::Instance::PerlSub->new(code => sub {for(1..1e7){something}}),
   );
-  # (Note: Comparing the run of externals commands with evals probably isn't reliable)
+  # (Note: Comparing the run of externals commands with
+  #  evals/subs probably isn't reliable)
   $bench->run;
   $bench->report;
 
@@ -331,10 +333,13 @@ Takes one ore more instances of subclasses of L<Dumbbench::Instance>
 as argument. Each of those is one I<benchmark>, really.
 They are run in sequence and reported separately.
 
-Right now, there's two C<Dumbbench::Instance> implementations:
-L<Dumbbench::Instance::Cmd> for running/benchmarking external commands
-and L<Dumbbench::Instance::PerlEval> for running/benchmarking
-Perl code in this same process.
+Right now, there are the following C<Dumbbench::Instance> implementations:
+L<Dumbbench::Instance::Cmd> for running/benchmarking external commands,
+L<Dumbbench::Instance::PerlEval> for running/benchmarking
+Perl code in this same process using C<eval>,
+and
+L<Dumbbench::Instance::PerlSub> for running/benchmarking
+Perl code in this same process using a subroutine reference.
 
 =head2 run
 
@@ -458,6 +463,7 @@ robust estimates of the run time of meaningless benchmarks instead.
 L<Dumbbench::Instance>,
 L<Dumbbench::Instance::Cmd>,
 L<Dumbbench::Instance::PerlEval>, 
+L<Dumbbench::Instance::PerlSub>, 
 L<Dumbbench::Result>
 
 L<Benchmark>

@@ -126,7 +126,9 @@ __END__
 =head1 SEE ALSO
 
 L<Dumbbench>, L<Dumbbench::Instance>,
-L<Dumbbench::Instance::PerlEval>, L<Dumbbench::Result>
+L<Dumbbench::Instance::PerlEval>,
+L<Dumbbench::Instance::PerlSub>,
+L<Dumbbench::Result>
 
 L<Benchmark>
 

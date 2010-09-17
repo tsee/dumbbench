@@ -6,6 +6,7 @@ use List::Util qw/min max/;
 
 require Dumbbench::Instance::Cmd;
 require Dumbbench::Instance::PerlEval;
+require Dumbbench::Instance::PerlSub;
 
 use Class::XSAccessor {
   constructor => 'new',
@@ -165,7 +166,13 @@ __END__
 
 =head1 SEE ALSO
 
-L<Dumbbench>, L<Dumbbench::Instance::Cmd>, L<Dumbbench::Result>
+L<Dumbbench>
+
+L<Dumbbench::Instance::Cmd>,
+L<Dumbbench::Instance::PerlEval>,
+L<Dumbbench::Instance::PerlSub>
+
+L<Dumbbench::Result>
 
 L<Benchmark>
 

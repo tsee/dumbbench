@@ -1,5 +1,9 @@
 Revision history for Perl extension Dumbbench.
 
+0.02  Fri Sep 17 20:01 2010
+  - Fixed test that would fail to skip without SOOT.pm
+  - Add missing dependency on Params::Util
+
 0.01  Thu Sep 16 20:00 2010
   - original version
 

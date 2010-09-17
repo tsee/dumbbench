@@ -29,7 +29,7 @@ use Class::XSAccessor {
   )],
 };
 
-use constant TOO_SMALL => 1.e-3;
+use constant TOO_SMALL => 1.e-4;
 
 =head1 NAME
 
@@ -115,7 +115,6 @@ sub _run {
       last;
     }
     $n *= 2;
-    warn $n;
   }
   $self->$n_loop_acc($n);
 

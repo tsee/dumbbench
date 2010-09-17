@@ -18,6 +18,7 @@ sub median {
   my $self = shift;
   my @data = sort { $a <=> $b } @{$self->data}; # would be much faster to cache the order...
   #@$data = sort { $a <=> $b } @$data;
+  return() if not @data;
   my $n = @data;
   if ($n % 2) { # odd
     return $data[int($n/2)];

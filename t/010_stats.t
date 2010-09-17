@@ -33,7 +33,7 @@ is_approx($s->mad_dev, $mad*1.4826);
 
 SKIP: {
   eval "use SOOT qw/:all/;";
-  skip "Skipping extra tests since SOOT is not available", 1 if $@;
+  skip "Skipping extra tests since SOOT is not available", 6 if $@;
   my $fun = TF1->new("g","gaus(0)");
   $fun->SetParameters(1., 20., 5.);
   my $hist = TH1D->new("gaus", "", 1000, 0, 100);

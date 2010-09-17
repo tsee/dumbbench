@@ -153,8 +153,7 @@ sub _run {
 =for developers
 
 My mental model for the distribution was Gauss+outliers.
-Indeed, there's some Gaussian-like component to it, but at least at this low a level wrt. time span, systematic effects clearly dominate.
-If my expectation had been correct, the following algorithm should produce a reasonable EV +/- uncertainty:
+If my expectation is correct, the following algorithm should produce a reasonable EV +/- uncertainty:
 1) Calc. median of the whole distribution.
 2) Calculate the median-absolute deviation from the whole distribution (MAD, see wikipedia). It needs rescaling to become a measure of variability that is robust against outliers.
 (The MAD will be our initial guess for a "sigma")
@@ -279,7 +278,7 @@ As a module:
   );
   $bench->run;
   $bench->report;
-  
+
 =head1 DESCRIPTION
 
 This module attempts to implement reasonably robust benchmarking with
@@ -449,7 +448,11 @@ robust estimates of the run time of meaningless benchmarks instead.
 
 =head1 SEE ALSO
 
+L<Dumbbench::Instance>, L<Dumbbench::Instance::Cmd>, L<Dumbbench::Result>
+
 L<Benchmark>
+
+L<Number::WithError> does the Gaussian error propagation.
 
 L<http://en.wikipedia.org/wiki/Median_absolute_deviation>
 

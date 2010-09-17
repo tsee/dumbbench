@@ -5,6 +5,7 @@ use Carp ();
 use List::Util qw/min max/;
 
 require Dumbbench::Instance::Cmd;
+require Dumbbench::Instance::PerlEval;
 
 use Class::XSAccessor {
   constructor => 'new',

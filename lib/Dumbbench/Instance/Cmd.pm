@@ -38,8 +38,6 @@ Dumbbench::Instance::Cmd - Benchmarks an external command
 This class inherits from L<Dumbbench::Instance> and implements
 benchmarking of external commands.
 
-
-
 =head1 METHODS
 
 =head2 new
@@ -127,7 +125,8 @@ __END__
 
 =head1 SEE ALSO
 
-L<Dumbbench>, L<Dumbbench::Instance::Cmd>, L<Dumbbench::Result>
+L<Dumbbench>, L<Dumbbench::Instance>,
+L<Dumbbench::Instance::PerlEval>, L<Dumbbench::Result>
 
 L<Benchmark>
 

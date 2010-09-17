@@ -35,7 +35,7 @@ sub new {
       verbosity            => 0,
       target_rel_precision => 0.05,
       target_abs_precision => 0,
-      intial_runs          => 20,
+      initial_runs         => 20,
       max_iterations       => 10000,
       variability_measure  => 'mad',
       instances            => [],

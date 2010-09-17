@@ -254,7 +254,7 @@ __END__
 
 =head1 NAME
 
-Dumbbench - Perl extension more reliable benchmarking
+Dumbbench - More reliable benchmarking with the least amount of thinking
 
 =head1 SYNOPSIS
 

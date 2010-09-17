@@ -176,28 +176,36 @@ sub _run {
       @t = @timings; # doh
     }
     $n_good = @t;
-    my $new_stats = Dumbbench::Stats->new(data => \@t);
-    $sigma = $new_stats->$variability_measure() / sqrt(scalar(@t));
-    $mean = $new_stats->mean();
 
-    # stop condition
-    my $need_iter = 0;
-    if ($rel_precision > 0) {
-      my $rel = $sigma/$mean;
-      print "Reached relative precision $rel (neeed $rel_precision).\n" if $V > 1;
-      $need_iter++ if $rel > $rel_precision;
+    if (not $n_good and @timings == $max_iterations) {
+      $mean = 0; $sigma = 0;
+      last;
     }
-    if ($abs_precision > 0) {
-      print "Reached absolute precision $sigma (neeed $abs_precision).\n" if $V > 1;
-      $need_iter++ if $sigma > $abs_precision;
+    
+    if ($n_good) {
+      my $new_stats = Dumbbench::Stats->new(data => \@t);
+      $sigma = $new_stats->$variability_measure() / sqrt(scalar(@t));
+      $mean = $new_stats->mean();
+
+      # stop condition
+      my $need_iter = 0;
+      if ($rel_precision > 0) {
+        my $rel = $sigma/$mean;
+        print "Reached relative precision $rel (neeed $rel_precision).\n" if $V > 1;
+        $need_iter++ if $rel > $rel_precision;
+      }
+      if ($abs_precision > 0) {
+        print "Reached absolute precision $sigma (neeed $abs_precision).\n" if $V > 1;
+        $need_iter++ if $sigma > $abs_precision;
+      }
+      if ($n_good < $initial_timings) {
+        $need_iter++;
+      }
+      last if not $need_iter or @timings == $max_iterations;
     }
-    if ($n_good < $initial_timings) {
-      $need_iter++;
-    }
-    last if not $need_iter or @timings == $max_iterations;
 
     push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run());
-  }
+  } # end while more data required
 
   if (@timings == $max_iterations and not $dry) {
     print "Reached maximum number of iterations. Stopping. Precision not reached.\n";

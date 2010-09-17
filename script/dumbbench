@@ -11,6 +11,10 @@ sub usage {
 
   print <<USAGE;
 Usage: $0 [options] -- command with arguments
+Ore:   $0 [options] --code='Perl-code-to-benchmark'
+
+For a full manual of the underlying module, see
+"perldoc Dumbbench"
 
 Options:
  -p=X
@@ -28,6 +32,8 @@ Options:
                    printed to stdout.
  -s|--std          Use the standard deviation instead of the MAD as a
                    measure of variability.
+ --code='code'     Benchmarks Perl code (can be specified multiple times
+                   for multiple benchmarks)
 USAGE
   exit(1);
 }
@@ -41,7 +47,8 @@ our $DryRunCmd;
 our $MaxIter         = 1000;
 our $RawOutput       = 0;
 our $UseStdDeviation = 0;
-our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT 
+our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
+our @Code;
 
 Getopt::Long::Configure('bundling');
 GetOptions(
@@ -55,13 +62,16 @@ GetOptions(
   's|std'            => \$UseStdDeviation,
   'd|dryrun=s'       => \$DryRunCmd,
   'plot_timings'     => \$PlotTimings,
+  'code=s'           => \@Code,
 );
 
 if ($RawOutput) {
   $V = 0;
 }
 
-my @CMD = @ARGV or usage;
+usage() if not @Code and not @ARGV;
+
+my @CMD = @ARGV;
 
 if ($PlotTimings) {
   eval "use SOOT";
@@ -80,13 +90,27 @@ my $bench = Dumbbench->new(
   variability_measure  => ($UseStdDeviation ? 'std_dev' : 'mad_dev' ),
 );
 
-$bench->add_instances(
-  Dumbbench::Instance::Cmd->new(
-    name    => 'cli',
-    command => \@CMD,
-    (defined $DryRunCmd ? (dry_run_command => $DryRunCmd) : ()),
-  ),
-);
+if (@CMD) {
+  $bench->add_instances(
+    Dumbbench::Instance::Cmd->new(
+      name    => 'cmd',
+      command => \@CMD,
+      (defined $DryRunCmd ? (dry_run_command => $DryRunCmd) : ()),
+    ),
+  );
+}
+if (@Code) {
+  my $i = 0;
+  $bench->add_instances(
+    map {
+      $i++;
+      Dumbbench::Instance::PerlEval->new(
+        name => 'code' . $i,
+        code => $Code[$i-1],
+      ),
+    } @Code
+  );
+}
 
 $bench->run;
 
@@ -109,3 +133,4 @@ if ($PlotTimings) {
   defined($SOOT::gApplication) && 1; # silence warnings;
   $SOOT::gApplication->Run();
 }
+

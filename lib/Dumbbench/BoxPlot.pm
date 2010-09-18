@@ -59,7 +59,7 @@ sub _box_n_whisker {
   my $cv = TCanvas->new("box_plot");
 
   #$cv->SetStatistics(0);
-  my $bg = TH1D->new("bg", "", 2, 0.5, $npop+0.5)->keep;
+  my $bg = TH1D->new("bg", "", $npop, 0.5, $npop+0.5)->keep;
   $bg->SetStats(kFALSE);
   $bg->GetYaxis()->SetRangeUser($min-$range*.05, $max+$range*.05);
   $bg->SetTitle(";;Time [s]");

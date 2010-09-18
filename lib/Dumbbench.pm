@@ -248,6 +248,14 @@ sub report {
   }
 }
 
+sub box_plot {
+  my $self = shift;
+  eval "require Dumbbench::BoxPlot;";
+  return() if $@;
+
+  return Dumbbench::BoxPlot->new($self);
+}
+
 1;
 
 __END__

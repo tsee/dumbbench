@@ -130,6 +130,8 @@ if ($PlotTimings) {
     }
   }
 
+  $bench->box_plot->show;
+
   defined($SOOT::gApplication) && 1; # silence warnings;
   $SOOT::gApplication->Run();
 }

@@ -2,7 +2,6 @@
 use strict;
 use warnings;
 use Dumbbench;
-use Time::HiRes qw/time/;
 use Getopt::Long qw/GetOptions/;
 
 sub usage {

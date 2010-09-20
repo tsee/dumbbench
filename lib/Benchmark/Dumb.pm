@@ -40,8 +40,8 @@ sub _dumbbench_from_count {
   if ($count >= 1) {
     $opt{initial_runs} = int($count);
   }
-  elsif ($count > 0 and $count < 1) {
-    $opt{target_rel_precision} = $count;
+  if (int($count) != $count) {
+    $opt{target_rel_precision} = $count - int($count);
   }
   else { # $count < 0
     Carp::croak("The negative-value variant of COUNT in benchmarks is not supported by Benchmark::Dumb");
@@ -91,11 +91,10 @@ sub timethis {
   return $res;
 }
 
-sub timethese {
+sub _timethese_guts {
   my $count = shift;
   my $instances = shift;
-  Carp::croak("Need count and code-hashref as arguments")
-    if not defined $count or not ref($instances) or not ref($instances) eq 'HASH';
+  my $silent = shift;
 
   my $max_name_len = 1;
   my $bench = _dumbbench_from_count($count); # FIXME %opt?
@@ -105,20 +104,112 @@ sub timethese {
   }
 
   $bench->run;
+  $bench->verbosity(0) if $silent;
 
-  print "Benchmark: ran ",
-        join(', ', map $_->name, $bench->instances),
-        ".\n";
+  if (not $silent) {
+    print "Benchmark: ran ",
+          join(', ', map $_->name, $bench->instances),
+          ".\n";
+  }
 
   my $result = {};
   foreach my $inst ($bench->instances) {
     my $r = $result->{$inst->name} = __PACKAGE__->_new(
       instance => $inst,
     );
-    printf("%${max_name_len}s: ", $r->name);
-    print $r->timestr(), "\n";
+    if (not $silent) {
+      printf("%${max_name_len}s: ", $r->name);
+      print $r->timestr(), "\n";
+    }
   }
   return $result;
+}
+
+sub timethese {
+  my $count = shift;
+  my $instances = shift;
+  Carp::croak("Need count and code-hashref as arguments")
+    if not defined $count or not ref($instances) or not ref($instances) eq 'HASH';
+
+  return _timethese_guts($count, $instances, 0);
+}
+
+
+sub cmpthese {
+  my $count = shift;
+  my $codehashref = shift;
+  my $style = shift; # ignored unless 'none'
+
+  my $results;
+  if (ref($count)) {
+    $results = $count;
+  }
+  else {
+    $results = _timethese_guts($count, $codehashref, 'silent');
+  }
+
+  my @sort_res = map [$_, $results->{$_}, $results->{$_}->_rate], keys %$results;
+  @sort_res = sort { $a->[2] <=> $b->[2] } @sort_res;
+
+  my @cols = map $_->[0], @sort_res;
+  my @rows = (
+    ['', 'Rate', @cols]
+  );
+
+  foreach my $record (@sort_res) {
+    my ($name, $bench, $rate) = @$record;
+    my $rstr = $bench->_rate_str($rate) . '/s';
+    $rstr =~ s/\s+//g;
+    my @row;
+    push @row, $name, $rstr;
+
+    foreach my $cmp_record (@sort_res) {
+      my ($cmp_name, $cmp_bench, $cmp_rate) = @$cmp_record;
+      if ($cmp_name eq $name) {
+        push @row, '--';
+        next;
+      }
+
+      my $cmp = 100*$rate/$cmp_rate - 100;
+      # skip the uncertainty if it's less than one permille
+      # absolute or relative
+      if ($cmp->raw_error->[0] < 1.e-1
+          or ($cmp->raw_error->[0]+1.e-15)/$cmp->raw_number < 1.e-3)
+      {
+        my $rounded = Number::WithError::round_a_number($cmp->raw_number, -1);
+        push @row, sprintf('%.1f', $rounded) . '%';
+      }
+      else {
+        my $cmp_str = $bench->_rate_str($cmp).'%'; # abuse
+        $cmp_str =~ s/\s+//g;
+        push @row, $cmp_str;
+      }
+    }
+
+    push @rows, \@row;
+  }
+
+  if (lc($style) ne 'none') {
+    # find the max column lengths
+    # could be done in the above iteration, too
+    my $ncols = @{$rows[0]};
+    my @col_len = ((0) x $ncols);
+    foreach my $row (@rows) {
+      foreach my $colno (0..$ncols-1) {
+        $col_len[$colno] = length($row->[$colno])
+          if length($row->[$colno]) > $col_len[$colno];
+      }
+    }
+
+    my $format = join( ' ', map { "%${_}s" } @col_len) . "\n";
+    substr( $format, 1, 0 ) = '-'; # right-align name
+
+    foreach my $row (@rows) {
+      printf($format,  @$row);
+    }
+  }
+
+  return \@rows;
 }
 
 
@@ -185,17 +276,29 @@ sub timestr {
   }
   $rel = sprintf("\%.${digits}f", $rel);
   
-  my $per_sec = 1./$res; # the joys of overloading. See Number::WithError.
+  my $rate = $self->_rate_str;
+  my $str = "$time +- $err wallclock secs ($rel%) @ ($rate)/s (n=" . $res->nsamples . ")";
+
+  return $str;
+}
+
+sub _rate_str {
+  my $self = shift;
+  my $per_sec = shift || $self->_rate;
 
   # The joys of people-not-enjoying-scientific-notation
   my $digit = $per_sec->significant_digit;
   $digit = "." . -$digit if $digit < 0;
   my $ps_format = "%${digit}f";
-  my $ps_string = sprintf("$ps_format +/- $ps_format", $per_sec->number*1., $per_sec->error->[0]);
+  my $ps_string = sprintf("$ps_format +- $ps_format", $per_sec->number*1., $per_sec->error->[0]);
+  return $ps_string;
+}
 
-  my $str = "$time +- $err wallclock secs ($rel%) @ ($ps_string)/s (n=" . $res->nsamples . ")";
-
-  return $str;
+sub _rate {
+  my $self = shift;
+  my $res = $self->_result;
+  my $per_sec = 1./($res+1.e-20); # the joys of overloading. See Number::WithError.
+  return $per_sec;
 }
 
 
@@ -262,9 +365,9 @@ may seem like a tempting idea, but if you care at all about the precision
 of your result, it's quite useless.
 B<This usage is not supported by C<Benchmark::Dumb>!>
 
-Instead, a positive floating point number that is smaller than one
-indicates the target I<relative precision> that you expect from the result.
-This is the preferred usage pattern.
+Instead, if you pass a positive floating point number as C<$count>,
+the fractional part of the number willbe interpreted as the target
+I<relative precision> that you expect from the result.
 
 Finally, supplying a C<0> as C<$count> means that C<Dumbbench> will
 be invoked with the default settings. This is good enough for most cases.

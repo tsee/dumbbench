@@ -62,7 +62,7 @@ sub _prepare {
   my $class = ref($code) ? "Dumbbench::Instance::PerlSub" : "Dumbbench::Instance::PerlEval";
   $bench->add_instances(
     $class->new(
-      name => 'anon', code => $code,
+      name => $name, code => $code,
     )
   );
   return $bench;

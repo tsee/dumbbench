@@ -314,6 +314,9 @@ the resulting uncertainty and goes through some pain to discard bad runs and sub
 overhead from the timings. The reported timing includes an uncertainty, so that multiple
 benchmarks can more easily be compared.
 
+Please note that C<Dumbbench> works entirely with wallclock time as reported by
+C<Time::HiRes>' C<time()> function.
+
 =head1 METHODS
 
 In addition to the methods listed here, there are read-only

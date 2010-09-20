@@ -11,7 +11,7 @@ sub usage {
 
   print <<USAGE;
 Usage: $0 [options] -- command with arguments
-Ore:   $0 [options] --code='Perl-code-to-benchmark'
+Or:    $0 [options] --code='Perl-code-to-benchmark'
 
 For a full manual of the underlying module, see
 "perldoc Dumbbench"

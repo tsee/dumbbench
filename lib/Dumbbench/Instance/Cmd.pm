@@ -82,7 +82,9 @@ sub single_run {
 
   my @cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
   @cmd = ("") if not @cmd;
-  my $start = Time::HiRes::time();
+  my $start;
+  my $tbase = Time::HiRes::time();
+  while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
   system({$cmd[0]} @cmd);
   my $end = Time::HiRes::time();
 
@@ -109,7 +111,9 @@ sub single_dry_run {
     # FIXME For lack of a better dry run test, we always use perl for now
     @cmd = ($^W, qw(-e 1));
   }
-  my $start = Time::HiRes::time();
+  my $start;
+  my $tbase = Time::HiRes::time();
+  while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
   system({$cmd[0]} @cmd);
   my $end = Time::HiRes::time();
 

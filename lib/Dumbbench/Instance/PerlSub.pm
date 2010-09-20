@@ -107,7 +107,9 @@ sub _run {
   my $duration;
   my $n = $self->$n_loop_acc || 1;
   while (1) {
-    my $start = Time::HiRes::time();
+    my $start;
+    my $tbase = Time::HiRes::time();
+    while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
     Dumbbench::Instance::PerlSub::_Lexical::runsub($n, $code);
     my $end = Time::HiRes::time();
 

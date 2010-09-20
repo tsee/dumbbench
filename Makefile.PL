@@ -6,7 +6,7 @@ WriteMakefile(
     NAME              => 'Dumbbench',
     VERSION_FROM      => 'lib/Dumbbench.pm', # finds $VERSION
     PREREQ_PM         => {
-      'Number::WithError' => '0',
+      'Number::WithError' => '1.00',
       'Class::XSAccessor' => '1.05',
       'Carp'              => '0',
       'Time::HiRes'       => '0',

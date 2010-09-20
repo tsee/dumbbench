@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 23;
+use Test::More tests => 27;
 use Benchmark::Dumb qw/:all/;
 use Capture::Tiny qw/capture/;
 
@@ -56,11 +56,18 @@ ok($stderr =~ /Precision will be off/, "low count warns about precision");
 
 my $hashr;
 ($stdout, $stderr) = capture {
-  $hashr= timethese(1, { foo => 'for(1..1e1){}', bar => sub {for(1..1e1){}} } );
+  $hashr = timethese(1, { foo => 'for(1..1e1){}', bar => sub {for(1..1e1){}} } );
 };
 
 my $n_wallclock_mentions =()= $stdout =~ /wallclock/g;
 is($n_wallclock_mentions, 2, "two benchmarks run");
 ok($stdout =~ /Benchmark.*bar.*foo/);
 ok($stderr =~ /Precision will be off/);
+
+ok(ref($hashr) && ref($hashr) eq 'HASH', "returns hashref");
+is(scalar(keys %$hashr), 2, "two results");
+
+foreach my $r (qw(foo bar)) {
+  isa_ok($hashr->{$r}, 'Benchmark::Dumb');
+}
 

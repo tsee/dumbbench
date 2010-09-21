@@ -164,18 +164,12 @@ sub _run {
   my $n_good = 0;
   my $variability_measure = $self->variability_measure;
   while (1) {
-    $sigma = $stats->$variability_measure();# / sqrt(scalar(@timings));
-    $mean  = $stats->mean();
-    my $median = $stats->median();
-    my $outlier_rejection = $self->outlier_rejection;
-    my @t;
-    if ($outlier_rejection) {
-      @t = grep {abs($_-$median) < $outlier_rejection*$sigma} @timings;
-    }
-    else {
-      @t = @timings; # doh
-    }
-    $n_good = @t;
+    my ($good, $outliers) = $stats->filter_outliers(
+      variability_measure => $variability_measure,
+      nsigma_outliers     => $self->outlier_rejection,
+    );
+
+    $n_good = @$good;
 
     if (not $n_good and @timings == $max_iterations) {
       $mean = 0; $sigma = 0;
@@ -183,8 +177,8 @@ sub _run {
     }
     
     if ($n_good) {
-      my $new_stats = Dumbbench::Stats->new(data => \@t);
-      $sigma = $new_stats->$variability_measure() / sqrt(scalar(@t));
+      my $new_stats = Dumbbench::Stats->new(data => $good);
+      $sigma = $new_stats->$variability_measure() / sqrt($n_good);
       $mean = $new_stats->mean();
 
       # stop condition

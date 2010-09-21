@@ -17,12 +17,10 @@ our $VERSION = '0.03';
 
 require Exporter;
 
-# TODO: cmpthese countit
-#
 our @ISA = qw(Exporter);
 our @EXPORT = ();
 our @EXPORT_OK = qw(
-  timeit timethis timethese cmpthese countit
+  timeit timethis timethese cmpthese
   timediff timestr timesum 
 );
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
@@ -400,11 +398,105 @@ C<package> statement in your code.
 
 =item *
 
-The C<debug> method is not implemented.
+The C<debug> method is not implemented and neither is the C<countit>
+function.
+
+=item *
+
+Some things that were previously considered functions are now considered
+primarily methods (see C<METHODS> below). But they are all importable
+and callable as functions.
 
 =back
 
 =head1 FUNCTIONS
+
+These functions work mostly (see the C<$count> gotcha above)
+like the equivalent functions in the C<Benchmark> module, but
+the textual output is different in that it contains estimates
+of the uncertainties. Some of the I<style> and I<format>
+options of the original functions are ignored for the time being.
+
+I'm quoting the C<Benchmark> documentation liberally.
+
+=head2 timethis(COUNT, CODE, [TITLE, [STYLE]])
+
+Time I<COUNT> iterations of I<CODE>. I<CODE> may be a string to eval
+or a code reference. Unlike with the original C<Benchmark>,
+the code will B<not> run in the caller's package. Results will be printed
+to C<STDOUT> as I<TITLE> followed by the C<timestr()>.
+I<TITLE> defaults to C<"timethis COUNT"> if none is provided.
+
+I<STYLE> determines the format of the output, as described for C<timestr()> below.
+
+Please read the section on C<Differences to Benchmark.pm>
+for a discussion of how the I<COUNT> parameter is interpreted.
+
+Returns a C<Benchmark::Dumb> object.
+
+=head2 timeit(COUNT, CODE)
+
+Arguments: I<COUNT> is the number of times to run the loop (see discussion above),
+and I<CODE> is the code to run. I<CODE> may be either a code reference or a
+string to be eval'd. Unlike with the original C<Benchmark>,
+the code will B<not> run in the caller's package.
+
+Returns a C<Benchmark::Dumb> object.
+
+=head2 timethese(COUNT, CODEHASHREF, [STYLE])
+
+The I<CODEHASHREF> is a reference to a hash containing names as keys
+and either a string to eval or a code reference for each value.
+For each (I<KEY>, I<VALUE>) pair in the I<CODEHASHREF>, this routine will call
+
+  timethis(COUNT, VALUE, KEY, STYLE)
+
+The routines are called in string comparison order of I<KEY>.
+
+The I<COUNT> must be positive or zero. See discussion above.
+
+Returns a hash reference of C<Benchmark::Dumb> objects, keyed by name.
+
+=head2 cmpthese(COUNT, CODEHASHREF, [STYLE])
+cmpthese(RESULTSHASHREF, [STYLE])
+
+Optionally calls C<timethese()>, then outputs a comparison chart.  This:
+
+  cmpthese( 500.01, { a => "++\$i", b => "\$i *= 2" } ) ;
+
+outputs a chart like:
+
+FIXME
+
+         Rate    b    a
+  b 2831802/s   -- -61%
+  a 7208959/s 155%   --
+
+This chart is sorted from slowest to fastest, and shows the percent speed difference between each pair of tests
+as well as the uncertainties on the rates and the relative speed difference. The uncertainty on a speed difference
+may be omitted if it is below a 
+
+c<cmpthese> can also be passed the data structure that C<timethese()> returns:
+
+  my $results = timethese( 100.01, { a => "++\$i", b => "\$i *= 2" } ) ;
+  cmpthese( $results );
+
+in case you want to see both sets of results.  If the first argument is an
+unblessed hash reference, that is C<RESULTSHASHREF>; otherwise that is C<COUNT>.
+
+Returns a reference to an ARRAY of rows, each row is an ARRAY of cells from the above chart, including labels. This:
+
+  my $rows = cmpthese( 500.01, { a => '++$i', b => '$i *= 2' }, "none" );
+
+returns a data structure like:
+
+FIXME
+
+  [
+      [ '',       'Rate',   'b',    'a' ],
+      [ 'b', '2885232/s',  '--', '-59%' ],
+      [ 'a', '7099126/s', '146%',  '--' ],
+  ]
 
 =head1 METHODS
 
@@ -412,13 +504,58 @@ Please note that while the original C<Benchmark> objects
 practically asked for manual introspection since the API
 didn't provide convenient access to all information,
 that practice is frowned upon with C<Benchmark::Dumb> objects.
-You have been warned.
+You have been warned. If there's a piece of API missing,
+let me know.
+
+There's no public constructor for C<Benchmark::Dumb> objects
+because it doesn't do what the C<Benchmark> constructor did:
+It's not running C<time()> for you.
+
+=head2 name()
+
+Returns the name of the benchmark result if any. (Not in C<Benchmark>.)
+
+=head2 iters()
+
+Returns the number of samples taken.
+
+=head2 timesum($other_benchmark)
+
+Returns a new C<Benchmark::Dumb> object that represents the sum
+of this benchmark and C<$other_benchmark>.
+
+C<timesum($b1, $b2)> was a function in the original C<Benchmark>
+module and may be called as a function on two C<Benchmark::Dumb>
+objects as well. It is available for importing into your
+namespace.
+
+=head2 timediff($other_benchmark)
+
+Returns a new C<Benchmark::Dumb> object that represents the difference
+between this benchmark and C<$other_benchmark> (C<$this-$other>).
+
+C<timediff($b1, $b2)> was a function in the original C<Benchmark>
+module and may be called as a function on two C<Benchmark::Dumb>
+objects as well. It is available for importing into your
+namespace.
+
+=head2 timestr()
+
+Returns a textual representation of this benchmark.
+
+C<timestr($b)> was a function in the original C<Benchmark>
+module and may be called as a function on a C<Benchmark::Dumb>
+object as well. It is available for importing into your
+namespace.
 
 =head1 SEE ALSO
 
 L<Dumbbench>
 
 L<Benchmark>
+
+Some of the documentation was taken from the documentation for
+C<Benchmark.pm>'s functions.
 
 =head1 AUTHOR
 

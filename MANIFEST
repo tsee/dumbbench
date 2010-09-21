@@ -1,4 +1,5 @@
 bin/dumbbench
+box_plot.png
 Changes
 lib/Benchmark/Dumb.pm
 lib/Dumbbench.pm

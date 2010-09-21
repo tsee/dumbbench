@@ -82,9 +82,10 @@ sub single_run {
 
   my @cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
   @cmd = ("") if not @cmd;
-  my $start;
-  my $tbase = Time::HiRes::time();
-  while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
+  #my $start;
+  #my $tbase = Time::HiRes::time();
+  #while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
+  my $start = Time::HiRes::time();
   system({$cmd[0]} @cmd);
   my $end = Time::HiRes::time();
 

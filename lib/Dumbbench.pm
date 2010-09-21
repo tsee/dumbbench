@@ -21,6 +21,7 @@ use Class::XSAccessor {
     variability_measure
     started
     outlier_rejection
+    subtract_dry_run
   )],
   accessors => [qw(verbosity)],
 };
@@ -41,6 +42,7 @@ sub new {
       instances            => [],
       started              => 0,
       outlier_rejection    => 3,
+      subtract_dry_run     => 1,
       @_,
     } => $class;
   }
@@ -85,7 +87,7 @@ sub instances {
 sub run {
   my $self = shift;
   Carp::croak("Can't re-run same benchmark instance") if $self->started;
-  $self->dry_run_timings;
+  $self->dry_run_timings if $self->subtract_dry_run;
   $self->run_timings;
 }
 
@@ -217,7 +219,8 @@ sub _run {
   }
   else {
     $instance->{timings} = \@timings;
-    $result -= $instance->dry_result if defined $instance->dry_result;
+    $result -= $instance->dry_result
+      if defined $instance->dry_result and $self->subtract_dry_run;
     $instance->result($result);
   }
 }

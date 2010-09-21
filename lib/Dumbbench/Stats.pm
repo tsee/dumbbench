@@ -120,5 +120,32 @@ sub std_dev {
   return sqrt($var);
 }
 
+sub filter_outliers {
+  my $self = shift;
+  my %opt = @_;
+  my $var_measure = $opt{variability_measure} || 'mad';
+  my $n_sigma = $opt{nsigma_outliers} || 2.5;
+  my $data = $self->data;
+
+  if ($n_sigma == 0) {
+    return([@$data], []); # special case: no filtering
+  }
+
+  my $median = $self->median;
+  my $variability = $self->$var_measure;
+  my @good;
+  my @outliers;
+  foreach my $x (@$data) {
+    if (abs($x-$median) < $variability*$n_sigma) {
+      push @good, $x;
+    }
+    else {
+      push @outliers, $x;
+    }
+  }
+
+  return(\@good, \@outliers);
+}
+
 
 1;

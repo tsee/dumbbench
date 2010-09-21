@@ -27,6 +27,7 @@ Options:
                    Increase, not decrease this number if possible.
  -m=X|--maxiter=X  Set a hard maximum number of iterations (default:1000)
                    If this hard limit is hit, the precision is off.
+ --no-dry-run      Disable subtraction of dry runs.
  --raw             Set raw output mode. Only the final count will be
                    printed to stdout.
  -s|--std          Use the standard deviation instead of the MAD as a
@@ -47,6 +48,7 @@ our $MaxIter         = 1000;
 our $RawOutput       = 0;
 our $UseStdDeviation = 0;
 our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
+our $NoDryRun        = 0;
 our @Code;
 
 Getopt::Long::Configure('bundling');
@@ -61,6 +63,7 @@ GetOptions(
   's|std'            => \$UseStdDeviation,
   'd|dryrun=s'       => \$DryRunCmd,
   'plot_timings'     => \$PlotTimings,
+  'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
   'code=s'           => \@Code,
 );
 
@@ -88,6 +91,7 @@ my $bench = Dumbbench->new(
   initial_runs         => $InitialTimings,
   max_iterations       => $MaxIter,
   variability_measure  => ($UseStdDeviation ? 'std_dev' : 'mad_dev' ),
+  subtract_dry_run     => !$NoDryRun,
 );
 
 if (@CMD) {
@@ -117,8 +121,12 @@ $bench->run;
 $bench->report($RawOutput);
 
 if ($PlotTimings) {
+  my @src = (
+    $NoDryRun ? (qw(timings_as_histogram))
+              : (qw(dry_timings_as_histogram timings_as_histogram))
+  );
   foreach my $instance ($bench->instances) {
-    foreach my $src (qw(dry_timings_as_histogram timings_as_histogram)) {
+    foreach my $src (@src) {
       my $hist = $instance->$src;
       if (defined $hist) {
         my $cv = TCanvas->new->keep;

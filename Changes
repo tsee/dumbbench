@@ -1,5 +1,17 @@
 Revision history for Perl extension Dumbbench.
 
+0.04  Tue Sep 21 20:01 2010
+  - Various small but important bug fixes.
+  - Now comes with Benchmark::Dumb, an almost-Benchmark-compatible
+    interface.
+  - Requires newer Number::WithError (1.00).
+  - Outlier-filtering now a feature of the statistics package.
+  - Ships with a toy-MC for simulating timing distributions.
+  - Outlier rejection now at three sigma instead of 2.5.
+  - Option to disable subtraction of dry-run timing.
+  - Iterative re-running now re-runs a fraction of the previous runs
+    to avoid frequent sorting overhead. (geometric progression)
+
 0.03  Mon Sep 20 20:01 2010
   - Fixed missing dependency on parent.
 

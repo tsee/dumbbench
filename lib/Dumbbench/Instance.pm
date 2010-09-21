@@ -150,7 +150,7 @@ sub _timings_as_histogram {
   my $is_dry  = shift;
   my $min = (@$timings ? min(@$timings)*0.95 : 0);
   my $max = (@$timings ? max(@$timings)*1.05 : 1);
-  my $n = 100; # min(100, @$timings/2);
+  my $n = max(@$timings/8, 100);
   my $prefix = $is_dry ? 'dry_' : '';
   my $name = defined($self->name) ? "${prefix}timings_" . $self->name : "${prefix}timings";
   my $hist = TH1D->new($name, "distribution of benchmark ${prefix}timings", int($n), $min, $max);

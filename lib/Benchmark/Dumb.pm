@@ -286,8 +286,11 @@ sub _rate_str {
 
   # The joys of people-not-enjoying-scientific-notation
   my $digit = $per_sec->significant_digit;
-  $digit = "." . -$digit if $digit < 0;
-  my $ps_format = "%${digit}f";
+  my $before_radix = length(int($per_sec->raw_number));
+  # FIXME: not clear if this makes sense. Need to revisit later in a day.
+  #$before_radix = 0 if int($per_sec->raw_number) == 0;
+  $digit = $before_radix - $digit;
+  my $ps_format = "%${digit}g";
   my $ps_string = sprintf("$ps_format +- $ps_format", $per_sec->number*1., $per_sec->error->[0]);
   return $ps_string;
 }

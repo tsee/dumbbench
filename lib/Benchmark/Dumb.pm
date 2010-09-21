@@ -35,14 +35,14 @@ sub import {
 sub _dumbbench_from_count {
   my $count = shift;
   my %opt = @_;
+  if ($count < 0) {
+    Carp::croak("The negative-value variant of COUNT in benchmarks is not supported by Benchmark::Dumb");
+  }
   if ($count >= 1) {
     $opt{initial_runs} = int($count);
   }
   if (int($count) != $count) {
     $opt{target_rel_precision} = $count - int($count);
-  }
-  else { # $count < 0
-    Carp::croak("The negative-value variant of COUNT in benchmarks is not supported by Benchmark::Dumb");
   }
 
   return Dumbbench->new(

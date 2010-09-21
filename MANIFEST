@@ -1,5 +1,8 @@
+bin/dumbbench
 Changes
+lib/Benchmark/Dumb.pm
 lib/Dumbbench.pm
+lib/Dumbbench/BoxPlot.pm
 lib/Dumbbench/Instance.pm
 lib/Dumbbench/Instance/Cmd.pm
 lib/Dumbbench/Instance/PerlEval.pm
@@ -8,8 +11,9 @@ lib/Dumbbench/Result.pm
 lib/Dumbbench/Stats.pm
 Makefile.PL
 MANIFEST			This list of files
-script/dumbbench
+simulator/simulate_benchmark.pl
 t/000_load.t
 t/010_stats.t
+t/100_bdumb.t
 xt/at_000_eval_vs_sub.t
 xt/at_000_external_vs_eval.t

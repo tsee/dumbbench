@@ -82,6 +82,7 @@ if ($PlotTimings) {
 }
 
 my $bench = Dumbbench->new(
+  verbosity            => $V,
   target_rel_precision => $RelPrecision,
   target_abs_precision => $AbsPrecision,
   initial_runs         => $InitialTimings,

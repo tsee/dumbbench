@@ -200,7 +200,10 @@ sub _run {
       last if not $need_iter or @timings == $max_iterations;
     }
 
-    push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run());
+    # progressively run more new timings in one go. Otherwise,
+    # we start to stall on the O(n*log(n)) complexity of the median.
+    my $n = List::Util::max(1, @timings*0.05);
+    push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run()) for 1..$n;
   } # end while more data required
 
   if (@timings == $max_iterations and not $dry) {
@@ -234,8 +237,8 @@ sub report {
     if (not $raw) {
       my $mean = $result->raw_number;
       my $sigma = $result->raw_error->[0];
-      print "Ran " . scalar(@{$instance->timings}) . " iterations of the command.\n";
-      print "Rejected " . (scalar(@{$instance->timings})-$result->nsamples) . " samples as outliers.\n";
+      print "Ran " . scalar(@{$instance->timings}) . " iterations ("
+        . (scalar(@{$instance->timings})-$result->nsamples) . " outliers).\n";
       print "Rounded run time per iteration: $result" . sprintf(" (%.1f%%)\n", $sigma/$mean*100);
       print "Raw:                            $mean +/- $sigma\n" if $self->verbosity;
     }

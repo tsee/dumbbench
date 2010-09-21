@@ -40,7 +40,7 @@ sub new {
       variability_measure  => 'mad',
       instances            => [],
       started              => 0,
-      outlier_rejection    => 2.5,
+      outlier_rejection    => 3,
       @_,
     } => $class;
   }
@@ -327,7 +327,7 @@ Constructor that takes the following arguments (with defaults):
   intial_runs          => 20,    # no. of guaranteed initial runs
   max_iterations       => 10000, # hard max. no of iterations
   variability_measure  => 'mad', # method for calculating uncertainty
-  outlier_rejection    => 2.5,   # no. of "sigma"s for the outlier rejection
+  outlier_rejection    => 3,     # no. of "sigma"s for the outlier rejection
 
 C<variability_measure> and C<outlier_rejection> probably make sense
 after reading C<HOW IT WORKS> below.

@@ -469,15 +469,13 @@ Optionally calls C<timethese()>, then outputs a comparison chart.  This:
 
 outputs a chart like:
 
-FIXME
-
-         Rate    b    a
-  b 2831802/s   -- -61%
-  a 7208959/s 155%   --
+                   Rate        b      a
+  b   5.75e+06+-47000/s       -- -70.1%
+  a 1.925e+07+-650000/s 235+-12%     --
 
 This chart is sorted from slowest to fastest, and shows the percent speed difference between each pair of tests
 as well as the uncertainties on the rates and the relative speed difference. The uncertainty on a speed difference
-may be omitted if it is below a 
+may be omitted if it is below one tenth of a percent.
 
 c<cmpthese> can also be passed the data structure that C<timethese()> returns:
 
@@ -493,12 +491,10 @@ Returns a reference to an ARRAY of rows, each row is an ARRAY of cells from the 
 
 returns a data structure like:
 
-FIXME
-
   [
-      [ '',       'Rate',   'b',    'a' ],
-      [ 'b', '2885232/s',  '--', '-59%' ],
-      [ 'a', '7099126/s', '146%',  '--' ],
+    [ '',                 'Rate',        'b',      'a' ],
+    [ 'b',   '5.75e+06+-47000/s',       '--', '-70.1%' ],
+    [ 'a', '1.925e+07+-650000/s', '235+-12%',     '--' ],
   ]
 
 =head1 METHODS

@@ -40,4 +40,48 @@ my $cv = TCanvas->new("c1");
 $h->SetLineColor(kRed);
 $h->Draw();
 $h2->Draw("SAME");
+
+
+sub sigma_truncated_gauss_variance {
+  my ($mean, $var, $nsigma) = @_;
+  my $sigma = sqrt($var);
+  return truncated_gauss_variance($mean, $var, $mean-$nsigma*$sigma, $mean+$nsigma*$sigma);
+}
+
+sub truncated_gauss_variance {
+  my ($mean, $var, $lower, $upper) = @_;
+  
+  #http://en.wikipedia.org/wiki/Truncated_normal_distribution
+  my $sigma = sqrt($var);
+  my $rlower = ($lower-$mean)/$sigma;
+  my $rupper = ($upper-$mean)/$sigma;
+
+  my $pdf_lower = gauss(0., 1., $rlower);
+  my $pdf_upper = gauss(0., 1., $rupper);
+  my $cdf_lower = gauss_cdf(0., 1., $rlower);
+  my $cdf_upper = gauss_cdf(0., 1., $rupper);
+
+  my $tr_var = $var * (
+    1
+    + ($rlower * $pdf_lower - $rupper * $pdf_upper) / ($cdf_upper - $cdf_lower)
+    - ( ($pdf_lower-$pdf_upper) / ($cdf_upper-$cdf_lower) )**2
+  );
+
+  return $tr_var;
+}
+
+my $fun = TH1D->new("t3","t3", 1000, 0., 10.);
+
+foreach my $nsigmahalf (1..20) {
+  my $nsigma = $nsigmahalf/2;
+  print "$nsigma: " . sqrt(sigma_truncated_gauss_variance(0., 1., $nsigma)) .  "\n";
+}
+foreach my $i (1..1000) {
+  my $c = $fun->GetBinCenter($i);
+  $fun->SetBinContent($i, sqrt(sigma_truncated_gauss_variance(0., 1., $c)));
+}
+
+my $cv2 = TCanvas->new("c2");
+$fun->Draw();
+
 $gApplication->Run();

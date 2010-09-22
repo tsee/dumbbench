@@ -210,6 +210,13 @@ sub _run {
     print "Reached maximum number of iterations. Stopping. Precision not reached.\n";
   }
 
+  # rescale sigma
+  # This is necessary since by cutting everything outside of n-sigma,
+  # we artificially reduce the variability of the main distribution.
+  if ($self->outlier_rejection) {
+    # TODO implement
+  }
+
   my $result = Dumbbench::Result->new(
     timing      => $mean,
     uncertainty => $sigma,

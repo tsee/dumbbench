@@ -72,16 +72,36 @@ sub truncated_gauss_variance {
 
 my $fun = TH1D->new("t3","t3", 1000, 0., 10.);
 
+my $mean = 4.4;
+my $sigma = 0.4;
+my $var = $sigma**2;
+
 foreach my $nsigmahalf (1..20) {
   my $nsigma = $nsigmahalf/2;
-  print "$nsigma: " . sqrt(sigma_truncated_gauss_variance(0., 1., $nsigma)) .  "\n";
+  print "$nsigma: " . sqrt(sigma_truncated_gauss_variance($mean, $var, $nsigma)) .  "\n";
 }
 foreach my $i (1..1000) {
   my $c = $fun->GetBinCenter($i);
-  $fun->SetBinContent($i, sqrt(sigma_truncated_gauss_variance(0., 1., $c)));
+  $fun->SetBinContent($i, sqrt(sigma_truncated_gauss_variance($mean, $var, $c)));
 }
 
 my $cv2 = TCanvas->new("c2");
 $fun->Draw();
+
+
+#my $trunc_sigma = 0.215;
+#sub find_true_sigma {
+#  my ($mean, $trunc_sigma, $nsigma) = @_;
+#
+#  my $trunc_var = $trunc_sigma**2;
+#  # trunc_sigma <= sigma
+#  my $var = $trunc_var;
+#  while (1) {
+#    my $tguess = sigma_truncated_gauss_variance($mean, $var, $nsigma);
+#    $var*=1.01;
+#    if ($tguess > $trunc_var)
+#  }
+#}
+#print "TRUE=".find_true_sigma(4.4, $trunc_sigma, 1.)."\n",
 
 $gApplication->Run();

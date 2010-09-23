@@ -78,9 +78,9 @@ sub _box_n_whisker {
     my ($wlow, $whigh) = find_whiskers($pop, $q1, $q3);
     my $x = $x_coord + 1.e-20;
     #print "$x $median $wlow $whigh\n";
-    my $g = TGraphAsymmErrors->new(1, [$x], [$median+0.], [0.], [0.], [abs($median-$wlow)+0.], [abs($median-$whigh)+0.])->keep;
+    my $g = TGraphAsymmErrors->new(1, [$x], [$median*1.], [0.], [0.], [abs($median-$wlow)*1.], [abs($median-$whigh)*1.])->keep;
     $g->Draw("l");
-    my $box = TGraphAsymmErrors->new(1, [$x], [$median+0.], [$dx], [$dx], [abs($q1-$median)+0.], [abs($q3-$median)+0.])->keep;
+    my $box = TGraphAsymmErrors->new(1, [$x], [$median*1.], [$dx], [$dx], [abs($q1-$median)*1.], [abs($q3-$median)*1.])->keep;
     $box->SetFillStyle(1001);
     $box->SetFillColor(17);
     $box->SetMarkerStyle(kBlue);

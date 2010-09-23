@@ -76,14 +76,17 @@ sub run {
   $self->stats_good($good_stats);
   $self->stats_outliers(Dumbbench::Stats->new(data => $outliers));
 
+  print "timings:           " . $stats->n . "\n";
+  print "good timings:      " . $good_stats->n . "\n";
+  print "outlier timings:   " . $self->stats_outliers->n . "\n";
 
   my $res_after  = $good_stats->median;
   my $err_after  = $good_stats->$variability_measure() / sqrt(@{$good});
   $self->ev_after(witherror($res_after, $err_after));
 
   print "true time:         " . $cfg->true_time, "\n";
-  print "before correction: " . $self->ev_before . "\n";
-  print "after correction:  " . $self->ev_after . "\n";
+  print "before correction: " . $self->ev_before . " (mean: " . $stats->mean . ")\n";
+  print "after correction:  " . $self->ev_after . " (mean: " . $good_stats->mean . ")\n";
   print "\n";
 }
 
@@ -131,7 +134,11 @@ sub _sim_single_timing {
   }
 
   # save the required no. of iterations for the actual runs
-  $self->iterations_per_run($n) if $opts{setup};
+  if ($opts{setup}) {
+    $self->iterations_per_run($n);
+    print "Detected a required $n iterations per run.\n";
+  }
+
 
   # discretization
   # In a nutshell, there is a limited precision to the clock

@@ -19,13 +19,14 @@ use Class::XSAccessor {
     data_distribution
     ev_before
     ev_after
+    iterations_per_run
   )],
 };
 
 sub from_yaml {
   my $class = shift;
   my $file = shift;
-  
+
   my $self = $class->new(
     config => Dumbbench::Sim::Config->from_yaml($file)
   );
@@ -39,7 +40,7 @@ sub run {
   my $cfg = $self->config;
   my $timings = [];
   $self->stats(Dumbbench::Stats->new(data => $timings));
-  
+
   # Random number generators for the different distributions
   # we rescale manually due to the small numbers involved.
   if (not $self->outlier_distribution) {
@@ -56,15 +57,16 @@ sub run {
     $self->data_distribution->SetParameters(1., 0., 1.); # max, mean, sigma
   }
 
+  $self->_sim_single_timing(setup => 1);
   $self->_sim_single_timing for 1..$runs;
-  
+
   # Dumbbench data analysis
   my $stats = $self->stats;
   my ($good, $outliers) = $stats->filter_outliers(
     variability_measure => $cfg->variability_measure,
     nsigma_outliers     => $cfg->outlier_rejection,
   );
-  
+
   my $variability_measure = $cfg->variability_measure;
   my $res_before = $stats->median;
   my $err_before = $stats->$variability_measure() / sqrt(@{$timings});
@@ -90,19 +92,45 @@ sub run {
 # simulates one run
 sub _sim_single_timing {
   my $self = shift;
+  my %opts = @_;
   my $cfg = $self->config;
-  
-  # Simulate n levels of offsets with a probability of occurring $outlier_fraction^n
-  my $offset = 0;
-  while (rand() < $cfg->outlier_fraction) {
-    $offset += $self->outlier_distribution->GetRandom()
-               * $cfg->outlier_jitter + $cfg->outlier_offset;
+
+  # The logic behind $opts{setup}, the while(1) loop and $n is that Dumbbench will
+  # first run a training run of your benchmark. If the run time is below some value
+  # (currently 1.e-4), then it puts a loop around your code and keeps doubling
+  # the loop count until the total time is above the limit.
+  # THEN, it keeps that N fixed for the real iterations. Here, $opts{setup} indicates
+  # the test run.
+
+  my $time = 0;
+  my $n = 1;
+  my $iloop = 0;
+  while (1) {
+    # Simulate n levels of offsets with a probability of occurring $outlier_fraction^n
+    my $offset = 0;
+    while (rand() < $cfg->outlier_fraction) {
+      $offset += $self->outlier_distribution->GetRandom()
+                 * $cfg->outlier_jitter + $cfg->outlier_offset;
+    }
+
+    # now add everything up to a result
+    my $regular_time = $self->data_distribution->GetRandom()
+                       * $cfg->gauss_jitter_sigma + $cfg->true_time; # rescale manually
+    $time += $offset + $regular_time;
+    $iloop++;
+
+    # end condition
+    if ($iloop == $n) {
+      # increase $n until we're above the limit
+      if ($opts{setup}) {
+        $n *= 2, next if $time < $cfg->duration_lower_limit;
+      }
+      last;
+    }
   }
-  
-  # now add everything up to a result
-  my $regular_time = $self->data_distribution->GetRandom()
-                     * $cfg->gauss_jitter_sigma + $cfg->true_time; # rescale manually
-  my $time = $offset + $regular_time;
+
+  # save the required no. of iterations for the actual runs
+  $self->iterations_per_run($n) if $opts{setup};
 
   # discretization
   # If we wait for a clock tick, it's the same as rounding
@@ -121,7 +149,7 @@ sub _sim_single_timing {
   # That's probably useless: We might as well skip the discretization.
   $time += rand() * $ctick if not $cfg->wait_for_tick;
 
-  push @{$self->stats->data}, $time;
+  push @{$self->stats->data}, $time/$n if not $opts{setup};
 }
 
 
@@ -130,7 +158,7 @@ sub _sim_single_timing {
 sub show_plots {
   my $self = shift;
   my $cfg = $self->config;
-  
+
   $gStyle->SetFrameFillColor(kWhite);
   $gStyle->SetPadColor(kWhite);
   $gStyle->SetCanvasColor(kWhite);
@@ -178,14 +206,14 @@ sub show_plots {
   $_->SetMarkerStyle(21), $_->SetMarkerSize(0.8) for $before;
   $_->SetMarkerStyle(20), $_->SetMarkerSize(0.7) for $after;
   $_->SetFillColor(0), $_->SetFillStyle(0) for ($before, $after);
-  
+
   my $cv = TCanvas->new("cv");
   $hist->Draw();
   $good_hist->Draw("SAME");
   $outlier_hist->Draw("SAME");
-  
+
   $_->Draw("P") for ($before, $after);
-  
+
   my $legend = $cv->BuildLegend();
   $legend->SetShadowColor(0);
   $legend->SetLineColor(0);

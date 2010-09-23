@@ -16,6 +16,7 @@ use Class::XSAccessor {
 
     true_time
     gauss_jitter_sigma
+    duration_lower_limit
 
     outlier_fraction
     outlier_offset

@@ -1,20 +1,20 @@
 ---
 # histogramming options
-hist_bins:            500
-hist_min:             1.0e-6
-hist_max:             9.0e-6
+hist_bins:            700
+hist_min:             4.05e-6
+hist_max:             5.41e-6
 # discretization options
 # clock_tick as it seems to be for my i7 laptop
-clock_tick:           1.1e-7
+clock_tick:           3.1e-8
 wait_for_tick:        0
 # true distribution center
-true_time:            4.3e-6
-gauss_jitter_sigma:   0.1e-6
-duration_lower_limit: 1.e-0
+true_time:            4.25e-6
+gauss_jitter_sigma:   0.55e-7
+duration_lower_limit: 1.e-4
 # outlier distribution
-outlier_fraction:     0.40
-outlier_offset:       0.6e-6
-outlier_jitter:       0.2e-6
+outlier_fraction:     0.14
+outlier_offset:       0.42e-6
+outlier_jitter:       0.8e-7
 # analysis options
 variability_measure:  'mad' 
 # reject anything further away from median

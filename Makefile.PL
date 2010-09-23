@@ -13,6 +13,7 @@ WriteMakefile(
       'Capture::Tiny'     => '0',
       'Params::Util'      => '0',
       'parent'            => '0',
+      'Statistics::CaseResampling' => '0.04',
     }, # e.g., Module::Name => 1.1
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'lib/Dumbbench.pm', # retrieve abstract from module

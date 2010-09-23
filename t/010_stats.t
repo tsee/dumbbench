@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 15;
+use Test::More tests => 21;
 use Dumbbench;
 use Dumbbench::Stats;
 
@@ -15,7 +15,19 @@ is_approx($s->median, 3);
 
 push @$data, 12;
 is_approx($s->mean, (1+2+3+4+5+12)/6);
-is_approx($s->median, 3.5);
+is_approx($s->median, 3);
+
+push @$data, 13, 14, 15, 16, 17;
+my @sorted = sort { $a <=> $b } @$data;
+is_approx($s->second_quartile, $s->median);
+is_approx($s->first_quartile, $sorted[@sorted/4]);
+is_approx($s->third_quartile, $sorted[@sorted*3/4]);
+
+push @$data, 0.5;
+@sorted = sort { $a <=> $b } @$data;
+is_approx($s->second_quartile, $s->median);
+is_approx($s->first_quartile, $sorted[@sorted/4]);
+is_approx($s->third_quartile, $sorted[@sorted*3/4]);
 
 my $mean = $s->mean;
 my $variance = 0;

@@ -81,8 +81,9 @@ sub run {
   my $err_after  = $good_stats->$variability_measure() / sqrt(@{$good});
   $self->ev_after(witherror($res_after, $err_after));
 
-  print "before: " . $self->ev_before . "\n";
-  print "after:  " . $self->ev_after . "\n";
+  print "true time:         " . $cfg->true_time, "\n";
+  print "before correction: " . $self->ev_before . "\n";
+  print "after correction:  " . $self->ev_after . "\n";
   print "\n";
 }
 
@@ -133,21 +134,30 @@ sub _sim_single_timing {
   $self->iterations_per_run($n) if $opts{setup};
 
   # discretization
-  # If we wait for a clock tick, it's the same as rounding
-  # down the no. of clock ticks measured. That means, we
-  # "lose" up to one clock tick of timing. 0.5 ticks on average.
+  # In a nutshell, there is a limited precision to the clock
+  # we're using. There is a feature to wait for the next clock
+  # tick and then start measuring.
+  # If we use this, then we always start at the beginning of the tick.
+  # The reported time will be shorter than the actual time because
+  # calling time() between ticks reports the time from the preceding tick
+  # (obviously). This is done by simply rounding down in units of the
+  # clock tick. More precisely, we're probably starting at a defined
+  # time in the clock tick since the "waiting" logic has overhead.
+  # But we're not simulating that atm.
+  # If we do not wait for a tick to start, we start at a random time
+  # within a clock tick. Therefore, when we call time() for the first time,
+  # it will give us a time that is earlier than the actual time by
+  # a uniform random time [0, $clock_tick). So we add that to the
+  # run time in this case BEFORE doing the truncation.
   my $ctick = $cfg->clock_tick;
+  my $in_tick_start;
+  if ($cfg->wait_for_tick) {
+    $in_tick_start = 0;
+  } else {
+    $in_tick_start = $gRandom->Uniform() * $ctick;
+  }
+  $time += $in_tick_start;
   $time = int($time/$ctick)*$ctick;
-
-  # If we don't wait, it's a bit more complicated than that.
-  # We still get a time that does not include the fraction
-  # into the last clock tick.
-  # But we may overestimate the time by up to one clock tick due
-  # to the start being somewhere half-way through the first tick
-  # (and by definition, the time will be start-of-clock-tick until
-  # the next tick). Thus we simply add a random time [0, ticklength).
-  # That's probably useless: We might as well skip the discretization.
-  $time += rand() * $ctick if not $cfg->wait_for_tick;
 
   push @{$self->stats->data}, $time/$n if not $opts{setup};
 }

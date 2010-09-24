@@ -20,21 +20,10 @@ sub sorted_data {
   return $sorted;
 }
 
-sub first_quartile {
-  my $self = shift;
-  my $n = $self->n;
-  my $k = int($n/4) + 1;
-  return Statistics::CaseResampling::select_kth($self->data, $k);
-}
-
+sub first_quartile { Statistics::CaseResampling::first_quartile($_[0]->data) }
 sub second_quartile { return $_[0]->median }
+sub third_quartile { Statistics::CaseResampling::third_quartile($_[0]->data) }
 
-sub third_quartile {
-  my $self = shift;
-  my $n = $self->n;
-  my $k = int($n*3/4) + 1;
-  return Statistics::CaseResampling::select_kth($self->data, $k);
-}
 
 sub n { scalar(@{$_[0]->data}) }
 
@@ -58,16 +47,24 @@ sub mean {
   return $self->sum / $self->n;
 }
 
-sub median {
+sub median { Statistics::CaseResampling::median($self->data) } # O(n)!
+
+sub median_confidence_limits {
   my $self = shift;
-  return Statistics::CaseResampling::median($self->data); # O(n)
+  my $nsigma = shift;
+  my $alpha = Statistics::CaseResampling::nsigma_to_alpha($nsigma);
+  # note: The 1000 here is kind of a lower limit for reasonable accuracy.
+  #       But if the data set is small, that's more significant. If the data
+  #       set is VERY large, then running much more than 1k resamplings
+  #       is VERY expensive. So 1k is probably a reasonable default.
+  return Statistics::CaseResampling::median_simple_confidence_limits($self->data, 1-$alpha, 1000) }
 }
 
 sub mad {
   my $self = shift;
   my $median = $self->median;
   my @val = map {abs($_ - $median)} @{$self->data};
-  return ref($self)->new(data => \@val)->median();
+  return ref($self)->new(data => \@val)->median;
 }
 
 sub mad_dev {

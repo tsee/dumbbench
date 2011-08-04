@@ -12,6 +12,9 @@ use Class::XSAccessor {
     command
     dry_run_command
   )],
+  accessors => [qw(
+    use_shell
+  )],
 };
 
 =head1 NAME
@@ -85,9 +88,19 @@ sub single_run {
   #my $start;
   #my $tbase = Time::HiRes::time();
   #while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
-  my $start = Time::HiRes::time();
-  system({$cmd[0]} @cmd);
-  my $end = Time::HiRes::time();
+  my ($start, $end);
+  if ($self->use_shell) {
+    my $cmd = join ' ', @cmd;
+    $start = Time::HiRes::time();
+    system($cmd);
+    $end = Time::HiRes::time();
+  }
+  else {
+    my $cmd = $cmd[0];
+    $start = Time::HiRes::time();
+    system({$cmd} @cmd);
+    $end = Time::HiRes::time();
+  }
 
   my $duration = $end-$start;
   return $duration;
@@ -111,11 +124,22 @@ sub single_dry_run {
     # FIXME For lack of a better dry run test, we always use perl for now as a fallback
     @cmd = ($^X, qw(-e 1));
   }
-  my $start;
-  my $tbase = Time::HiRes::time();
-  while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
-  system({$cmd[0]} @cmd);
-  my $end = Time::HiRes::time();
+
+  my ($start, $end);
+  if ($self->use_shell) {
+    my $cmd = join ' ', @cmd;
+    my $tbase = Time::HiRes::time();
+    while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
+    system($cmd);
+    $end = Time::HiRes::time();
+  }
+  else {
+    my $cmd = $cmd[0];
+    my $tbase = Time::HiRes::time();
+    while ( ($start = Time::HiRes::time()) <= $tbase+1.e-15 ) {} # wait for clock tick. See discussion in Benchmark.pm comments
+    system({$cmd} @cmd);
+    $end = Time::HiRes::time();
+  }
 
   my $duration = $end-$start;
   return $duration;

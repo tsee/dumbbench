@@ -102,15 +102,14 @@ sub single_dry_run {
     @cmd = (ref($self->{dry_run_command}) ? @{$self->{dry_run_command}} : ($self->{dry_run_command}));
   }
   else {
-    @cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
-    if (@cmd and $cmd[0] =~ /(?:^|\b)perl(?:\d+\.\d+\.\d+)?/) {
-      @cmd = ($cmd[0], '-e', '1');
+    my @orig_cmd = (ref($self->{command}) ? @{$self->{command}} : ($self->{command}));
+    if (@orig_cmd and $orig_cmd[0] =~ /(?:^|\b)perl(?:\d+\.\d+\.\d+)?/) {
+      @cmd = ($orig_cmd[0], '-e', '1');
     }
   }
   if (!@cmd) {
-    #@cmd = ("");
-    # FIXME For lack of a better dry run test, we always use perl for now
-    @cmd = ($^W, qw(-e 1));
+    # FIXME For lack of a better dry run test, we always use perl for now as a fallback
+    @cmd = ($^X, qw(-e 1));
   }
   my $start;
   my $tbase = Time::HiRes::time();

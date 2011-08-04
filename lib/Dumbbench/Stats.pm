@@ -47,7 +47,7 @@ sub mean {
   return $self->sum / $self->n;
 }
 
-sub median { Statistics::CaseResampling::median($self->data) } # O(n)!
+sub median { Statistics::CaseResampling::median($_[0]->data) } # O(n)!
 
 sub median_confidence_limits {
   my $self = shift;
@@ -57,7 +57,7 @@ sub median_confidence_limits {
   #       But if the data set is small, that's more significant. If the data
   #       set is VERY large, then running much more than 1k resamplings
   #       is VERY expensive. So 1k is probably a reasonable default.
-  return Statistics::CaseResampling::median_simple_confidence_limits($self->data, 1-$alpha, 1000) }
+  return Statistics::CaseResampling::median_simple_confidence_limits($self->data, 1-$alpha, 1000)
 }
 
 sub mad {

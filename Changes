@@ -1,5 +1,11 @@
 Revision history for Perl extension Dumbbench.
 
+0.05  Thu Aug  4 12:00 2011
+  - Fix for dry-runs of external commands.
+  - Now using the shell for testing external commands where necessary.
+  - Much faster stats due to using Statistics::CaseResampling.
+  - Some changes to the simulation code.
+
 0.04  Tue Sep 21 20:01 2010
   - Various small but important bug fixes.
   - Now comes with Benchmark::Dumb, an almost-Benchmark-compatible

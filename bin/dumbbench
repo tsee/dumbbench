@@ -27,6 +27,7 @@ Options:
                    Increase, not decrease this number if possible.
  -m=X|--maxiter=X  Set a hard maximum number of iterations (default:1000)
                    If this hard limit is hit, the precision is off.
+ -d=X|--dry-run=X  Set explicit dry-run command or code.
  --no-dry-run      Disable subtraction of dry runs.
  --raw             Set raw output mode. Only the final count will be
                    printed to stdout.
@@ -61,10 +62,10 @@ GetOptions(
   'm|maxiter=i'      => \$MaxIter,
   'raw'              => \$RawOutput,
   's|std'            => \$UseStdDeviation,
-  'd|dryrun=s'       => \$DryRunCmd,
   'plot_timings'     => \$PlotTimings,
-  'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
   'code=s'           => \@Code,
+  'd|dryrun|dry-run|dry_run=s' => \$DryRunCmd,
+  'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
 );
 
 if ($RawOutput) {
@@ -98,8 +99,11 @@ if (@CMD) {
   $bench->add_instances(
     Dumbbench::Instance::Cmd->new(
       name    => 'cmd',
-      command => \@CMD,
-      (defined $DryRunCmd ? (dry_run_command => $DryRunCmd) : ()),
+      (
+        defined $DryRunCmd
+        ? (dry_run_command => $DryRunCmd, use_shell => 1, command => join(" ", @CMD))
+        : (command => \@CMD)
+      ),
     ),
   );
 }

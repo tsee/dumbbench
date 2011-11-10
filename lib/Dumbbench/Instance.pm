@@ -160,6 +160,11 @@ sub _timings_as_histogram {
   return $hist;
 }
 
+sub _name_prefix {
+  my $name = $_[0]->name;
+  return defined($name) ? "$name: " : '';
+}
+
 1;
 
 __END__

@@ -115,6 +115,8 @@ sub _run {
   my $instance = shift;
   my $dry = shift;
 
+  my $name = $instance->_name_prefix;
+
   # for overriding in case of dry-run mode
   my $V = $self->verbosity || 0;
   my $initial_timings = $self->initial_runs;
@@ -130,7 +132,7 @@ sub _run {
     $max_iterations  *= 10;
   }
 
-  print "Running initial timing for warming up the cache...\n" if $V;
+  print "${name}Running initial timing for warming up the cache...\n" if $V;
   if ($dry) {
     # be generous, this is fast
     $instance->single_dry_run() for 1..3;
@@ -140,13 +142,13 @@ sub _run {
   }
   
   my @timings;
-  print "Running $initial_timings initial timings...\n" if $V;
+  print "${name}Running $initial_timings initial timings...\n" if $V;
   foreach (1..$initial_timings) {
-    print "Running timing $_...\n" if $V > 1;
+    print "${name}Running timing $_...\n" if $V > 1;
     push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run());
   }
 
-  print "Iterating until target precision reached...\n" if $V;
+  print "${name}Iterating until target precision reached...\n" if $V;
 
   my $stats = Dumbbench::Stats->new(data => \@timings);
   my $sigma;
@@ -187,11 +189,11 @@ sub _run {
       my $need_iter = 0;
       if ($rel_precision > 0) {
         my $rel = $sigma/$mean;
-        print "Reached relative precision $rel (neeed $rel_precision).\n" if $V > 1;
+        print "${name}Reached relative precision $rel (neeed $rel_precision).\n" if $V > 1;
         $need_iter++ if $rel > $rel_precision;
       }
       if ($abs_precision > 0) {
-        print "Reached absolute precision $sigma (neeed $abs_precision).\n" if $V > 1;
+        print "${name}Reached absolute precision $sigma (neeed $abs_precision).\n" if $V > 1;
         $need_iter++ if $sigma > $abs_precision;
       }
       if ($n_good < $initial_timings) {
@@ -207,7 +209,7 @@ sub _run {
   } # end while more data required
 
   if (@timings == $max_iterations and not $dry) {
-    print "Reached maximum number of iterations. Stopping. Precision not reached.\n";
+    print "${name}Reached maximum number of iterations. Stopping. Precision not reached.\n";
   }
 
   # rescale sigma
@@ -244,10 +246,22 @@ sub report {
     if (not $raw) {
       my $mean = $result->raw_number;
       my $sigma = $result->raw_error->[0];
-      print "Ran " . scalar(@{$instance->timings}) . " iterations ("
-        . (scalar(@{$instance->timings})-$result->nsamples) . " outliers).\n";
-      print "Rounded run time per iteration: $result" . sprintf(" (%.1f%%)\n", $sigma/$mean*100);
-      print "Raw:                            $mean +/- $sigma\n" if $self->verbosity;
+      my $name = $instance->_name_prefix;
+      printf(
+        "%sRan %u iterations (%u outliers).\n",
+        $name,
+        scalar(@{$instance->timings}),
+        scalar(@{$instance->timings})-$result->nsamples
+      );
+      printf(
+        "%sRounded run time per iteration: %s (%.1f%%)\n",
+        $name,
+        "$result",
+        $sigma/$mean*100
+      );
+      if ($self->verbosity) {
+        printf("%sRaw:                            $mean +/- $sigma\n", $name);
+      }
     }
     else {
       print $result, "\n";

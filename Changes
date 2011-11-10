@@ -1,5 +1,8 @@
 Revision history for Perl extension Dumbbench.
 
+0.06  Thu Nov 10 08:38 2011
+  - Show instance names in output where applicable.
+
 0.05  Thu Aug  4 12:00 2011
   - Fix for dry-runs of external commands.
   - Now using the shell for testing external commands where necessary.

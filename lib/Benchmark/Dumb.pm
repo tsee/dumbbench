@@ -136,7 +136,7 @@ sub timethese {
 sub cmpthese {
   my $count = shift;
   my $codehashref = shift;
-  my $style = shift; # ignored unless 'none'
+  my $style = shift || ''; # ignored unless 'none'
 
   my $results;
   if (ref($count)) {

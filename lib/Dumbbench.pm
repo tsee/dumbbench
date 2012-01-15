@@ -4,7 +4,7 @@ use warnings;
 use Carp ();
 use Time::HiRes ();
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 require Dumbbench::Result;
 require Dumbbench::Stats;
@@ -510,7 +510,7 @@ Steffen Mueller, E<lt>smueller@cpan.orgE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright (C) 2010, 2011 by Steffen Mueller
+Copyright (C) 2010, 2011, 2012 by Steffen Mueller
 
 This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.1 or,

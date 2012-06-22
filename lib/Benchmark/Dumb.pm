@@ -390,7 +390,7 @@ The cache-related functions aren't implemented because we don't use a cache.
 
 The original C<Benchmark.pm> implementation provides a rudimentary
 object-oriented interface. We do not faithfully copy that. See
-L<"/METHODS"> below.
+L</METHODS> below.
 
 =item *
 

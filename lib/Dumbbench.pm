@@ -481,6 +481,8 @@ value and the MAD of the truncated distribution as a measure of variability.
 To get the uncertainty on the expectation value, we take C<MAD / sqrt($N)> where
 C<$N> is the number of remaining measurements.
 
+=back
+
 =head2 Conclusion
 
 I hope I could convince you that interpreting less sophisticated benchmarks

@@ -1,5 +1,8 @@
 Revision history for Perl extension Dumbbench.
 
+0.08  Tue Jul 03 08:00 2012
+  - POD fix (Eduardo Ariño de la Rubia)
+
 0.07  Sun Jan 15 10:00 2012
   - Fix undefined value warning in cmpthese.
 

@@ -35,6 +35,8 @@ Options:
                    measure of variability.
  --code='code'     Benchmarks Perl code (can be specified multiple times
                    for multiple benchmarks)
+ --t|table=X       Output timings as a data table suitable for R. Each
+                   column of timings is headed by the code name.
 USAGE
   exit(1);
 }
@@ -49,6 +51,7 @@ our $MaxIter         = 1000;
 our $RawOutput       = 0;
 our $UseStdDeviation = 0;
 our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
+our $DataTable       = undef;
 our $NoDryRun        = 0;
 our @Code;
 
@@ -63,6 +66,7 @@ GetOptions(
   'raw'              => \$RawOutput,
   's|std'            => \$UseStdDeviation,
   'plot_timings'     => \$PlotTimings,
+  't|table=s'        => \$DataTable,
   'code=s'           => \@Code,
   'd|dryrun|dry-run|dry_run=s' => \$DryRunCmd,
   'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
@@ -146,5 +150,23 @@ if ($PlotTimings) {
 
   defined($SOOT::gApplication) && 1; # silence warnings;
   $SOOT::gApplication->Run();
+}
+
+if ($DataTable) {
+  my @timings = map { $_->timings } $bench->instances;
+
+  my $filename = join( '-', map { $_->name } $bench->instances ) . '.dat';
+  open my $fh, '>:utf8', $DataTable
+    or die "Could not open $DataTable: $!\n";
+
+  require List::Util;
+  my $max = List::Util::max( map { $#$_ } @timings );
+
+  say { $fh } join "\t", map { sprintf q("%s"), $_->name } $bench->instances;
+  foreach my $i ( 0 .. $max ) {
+    no warnings 'uninitialized';
+    say { $fh } join "\t", map { $_->[$i] } @timings;
+  }
+  # stuff here to run R to make a plot?
 }
 

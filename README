@@ -1,0 +1,8 @@
+Dumbbench is a fancier benchmark module for Perl. It times the
+runs of code, does some statistical analysis to discard outliers,
+and prints the results.
+
+See also:
+
+http://blogs.perl.org/users/steffen_mueller/2010/09/your-benchmarks-suck.html
+http://blogs.perl.org/users/steffen_mueller/dumbbench/

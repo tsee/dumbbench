@@ -11,6 +11,7 @@ sub usage {
   print <<USAGE;
 Usage: $0 [options] -- command with arguments
 Or:    $0 [options] --code='Perl-code-to-benchmark'
+Or:    $0 [options] --package='Perl-package-with-subs-to-benchmark'
 
 For a full manual of the underlying module, see
 "perldoc Dumbbench"
@@ -35,6 +36,9 @@ Options:
                    measure of variability.
  --code='code'     Benchmarks Perl code (can be specified multiple times
                    for multiple benchmarks)
+ --package='package' Perl package of subroutines to benchmark. The
+                   package must define get_subs_to_benchmark() that
+                   returns a list of subroutine names to benchmark
  --t|table=X       Output timings as a data table suitable for R. Each
                    column of timings is headed by the code name.
 USAGE
@@ -53,6 +57,7 @@ our $UseStdDeviation = 0;
 our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
 our $DataTable       = undef;
 our $NoDryRun        = 0;
+our $Package         = undef;
 our @Code;
 
 Getopt::Long::Configure('bundling');
@@ -70,13 +75,14 @@ GetOptions(
   'code=s'           => \@Code,
   'd|dryrun|dry-run|dry_run=s' => \$DryRunCmd,
   'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
+  'package=s'        => \$Package,
 );
 
 if ($RawOutput) {
   $V = 0;
 }
 
-usage() if not @Code and not @ARGV;
+usage() if not @Code and not @ARGV and not $Package;
 
 my @CMD = @ARGV;
 
@@ -122,6 +128,31 @@ if (@Code) {
       ),
     } @Code
   );
+}
+if ($Package) {
+  die "Invalid package name [$Package]\n" unless
+    $Package =~ m/\A[A-Z0-9_]+(?:::[A-Z0-9_])*\z/i;
+  eval "require $Package" or die "Could not load package $Package: $@\n";
+  die "get_subs_to_benchmark not defined in $Package"
+    unless $Package->can( 'get_subs_to_benchmark' );
+  my @subs = $Package->get_subs_to_benchmark;
+  foreach my $sub ( @subs ) {
+    unless ( $sub =~ m/\A[A-Z0-9_]+\z/i ) {
+      warn "$sub name is invalid. Skipping.\n";
+      next;
+    }
+    unless ( defined &{"${Package}::$sub"} ) {
+      warn "$sub is not defined in $Package. Skipping.\n";
+      next;
+    }
+
+    $bench->add_instances(
+      Dumbbench::Instance::PerlSub->new(
+        name => $sub,
+        code => \&{"${Package}::$sub"}
+      )
+    );
+  }
 }
 
 $bench->run;

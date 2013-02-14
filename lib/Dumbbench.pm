@@ -175,7 +175,7 @@ sub _run {
 
     $n_good = @$good;
 
-    if (not $n_good and @timings == $max_iterations) {
+    if (not $n_good and @timings >= $max_iterations) {
       $mean = 0; $sigma = 0;
       last;
     }
@@ -199,16 +199,16 @@ sub _run {
       if ($n_good < $initial_timings) {
         $need_iter++;
       }
-      last if not $need_iter or @timings == $max_iterations;
+      last if not $need_iter or @timings >= $max_iterations;
     }
 
     # progressively run more new timings in one go. Otherwise,
     # we start to stall on the O(n*log(n)) complexity of the median.
-    my $n = List::Util::max(1, @timings*0.05);
+    my $n = List::Util::min( $max_iterations - @timings, List::Util::max(1, @timings*0.05) );
     push @timings, ($dry ? $instance->single_dry_run() : $instance->single_run()) for 1..$n;
   } # end while more data required
 
-  if (@timings == $max_iterations and not $dry) {
+  if (@timings >= $max_iterations and not $dry) {
     print "${name}Reached maximum number of iterations. Stopping. Precision not reached.\n";
   }
 

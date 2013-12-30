@@ -1,5 +1,14 @@
 Revision history for Perl module Dumbbench
 
+0.09  2013-12-30
+	* Fix for infinite loops (David Golden)
+	* Benchmarks can be taken from modules (brian d foy)
+	* Option to output R-compatible data table (brian d foy)
+	* Example R script for making box plots from table data (brian d foy)
+	* --pin-frequency option on Linux to pin CPU frequency for
+    more consistent benchmark results.
+    (Warning: Use this option at your own risk.)
+
 0.08 - 2012-07-03
 	* POD fix (Eduardo Ariño de la Rubia)
 

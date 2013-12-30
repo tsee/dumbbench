@@ -41,6 +41,11 @@ Options:
                    returns a list of subroutine names to benchmark
  --t|table=X       Output timings as a data table suitable for R. Each
                    column of timings is headed by the code name.
+ --pin-frequency   Advanced option (Linux only): Attempt to use 'sudo'
+                   to pin the CPU frequency on CPUs that can do dynamic
+                   frequency scaling. This improves accuracy, but relies
+                   on a hardcoded location in the /sys/ filesystem.
+                   Use at your own risk.
 USAGE
   exit(1);
 }
@@ -58,6 +63,7 @@ our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
 our $DataTable       = undef;
 our $NoDryRun        = 0;
 our $Package         = undef;
+our $PinFrequency    = 0;
 our @Code;
 
 Getopt::Long::Configure('bundling');
@@ -76,6 +82,8 @@ GetOptions(
   'd|dryrun|dry-run|dry_run=s' => \$DryRunCmd,
   'no_dry_run|nodryrun|no-dry-run' => \$NoDryRun,
   'package=s'        => \$Package,
+  'pin_frequency|pin-frequency'
+                     => \$PinFrequency,
 );
 
 if ($RawOutput) {
@@ -117,6 +125,7 @@ if (@CMD) {
     ),
   );
 }
+
 if (@Code) {
   my $i = 0;
   $bench->add_instances(
@@ -129,6 +138,7 @@ if (@Code) {
     } @Code
   );
 }
+
 if ($Package) {
   die "Invalid package name [$Package]\n" unless
     $Package =~ m/\A[A-Z0-9_]+(?:::[A-Z0-9_])*\z/i;
@@ -155,7 +165,18 @@ if ($Package) {
   }
 }
 
-$bench->run;
+SCOPE: {
+  my $frequency_pinner;
+  local $SIG{INT} = sub {undef $frequency_pinner; exit;};
+  if ($PinFrequency) {
+    require Dumbbench::CPUFrequencyPinner;
+    $frequency_pinner = Dumbbench::CPUFrequencyPinner->new;
+    $frequency_pinner->set_max_frequencies($frequency_pinner->min_frequencies->[0]);
+  }
+
+  $bench->run;
+
+}
 
 $bench->report($RawOutput);
 

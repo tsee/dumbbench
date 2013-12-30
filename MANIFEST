@@ -3,6 +3,7 @@ Changes
 lib/Benchmark/Dumb.pm
 lib/Dumbbench.pm
 lib/Dumbbench/BoxPlot.pm
+lib/Dumbbench/CPUFrequencyPinner.pm
 lib/Dumbbench/Instance.pm
 lib/Dumbbench/Instance/Cmd.pm
 lib/Dumbbench/Instance/PerlEval.pm
@@ -11,6 +12,14 @@ lib/Dumbbench/Result.pm
 lib/Dumbbench/Stats.pm
 Makefile.PL
 MANIFEST			This list of files
+r/boxplot.r
+README
+simulator/cfg/fast.yml
+simulator/cfg/simple.yml
+simulator/cfg/slow.yml
+simulator/gauss_cdf_test.pl
+simulator/lib/Dumbbench/Sim.pm
+simulator/lib/Dumbbench/Sim/Config.pm
 simulator/simulate_benchmark.pl
 t/000_load.t
 t/010_stats.t

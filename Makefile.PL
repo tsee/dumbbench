@@ -75,6 +75,7 @@ my %WriteMakefile = (
 		'Params::Util'      => '0',
 		'parent'            => '0',
 		'Statistics::CaseResampling' => '0.06',
+		'Devel::CheckOS'    => '0',
 		},
 
 	'META_MERGE' => {

@@ -1,3 +1,5 @@
+#!/usr/bin/r
+# r --slave --quiet --args *.dat < boxplot.r
 file <- commandArgs(trailingOnly=T)[1]
 print( file )
 t <- read.table(

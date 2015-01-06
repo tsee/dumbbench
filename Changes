@@ -1,39 +1,39 @@
 Revision history for Perl module Dumbbench
 
 0.08  Tue Jul 03 08:00 2012
-  - POD fix (Eduardo Ariño de la Rubia)
+	* POD fix (Eduardo Ariño de la Rubia)
 
 0.07  Sun Jan 15 10:00 2012
-  - Fix undefined value warning in cmpthese.
+	* Fix undefined value warning in cmpthese.
 
 0.06  Thu Nov 10 08:38 2011
-  - Show instance names in output where applicable.
+	* Show instance names in output where applicable.
 
 0.05  Thu Aug  4 12:00 2011
-  - Fix for dry-runs of external commands.
-  - Now using the shell for testing external commands where necessary.
-  - Much faster stats due to using Statistics::CaseResampling.
-  - Some changes to the simulation code.
+	* Fix for dry-runs of external commands.
+	* Now using the shell for testing external commands where necessary.
+	* Much faster stats due to using Statistics::CaseResampling.
+	* Some changes to the simulation code.
 
 0.04  Tue Sep 21 20:01 2010
-  - Various small but important bug fixes.
-  - Now comes with Benchmark::Dumb, an almost-Benchmark-compatible
+	* Various small but important bug fixes.
+	* Now comes with Benchmark::Dumb, an almost-Benchmark-compatible
     interface.
-  - Requires newer Number::WithError (1.00).
-  - Outlier-filtering now a feature of the statistics package.
-  - Ships with a toy-MC for simulating timing distributions.
-  - Outlier rejection now at three sigma instead of 2.5.
-  - Option to disable subtraction of dry-run timing.
-  - Iterative re-running now re-runs a fraction of the previous runs
+	* Requires newer Number::WithError (1.00).
+	* Outlier-filtering now a feature of the statistics package.
+	* Ships with a toy-MC for simulating timing distributions.
+	* Outlier rejection now at three sigma instead of 2.5.
+	* Option to disable subtraction of dry-run timing.
+	* Iterative re-running now re-runs a fraction of the previous runs
     to avoid frequent sorting overhead. (geometric progression)
 
 0.03  Mon Sep 20 20:01 2010
-  - Fixed missing dependency on parent.
+	* Fixed missing dependency on parent.
 
 0.02  Fri Sep 17 20:01 2010
-  - Fixed test that would fail to skip without SOOT.pm
-  - Add missing dependency on Params::Util
+	* Fixed test that would fail to skip without SOOT.pm
+	* Add missing dependency on Params::Util
 
 0.01  Thu Sep 16 20:00 2010
-  - original version
+	* original version
 

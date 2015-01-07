@@ -1,8 +1,14 @@
 use 5.0080005;
+use strict;
+use warnings;
+
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
-WriteMakefile(
+my $github    = 'https://github.com/briandfoy/';
+my $main_file = 'lib/';
+
+my %WriteMakefile = (
     NAME              => 'Dumbbench',
     VERSION_FROM      => 'lib/Dumbbench.pm', # finds $VERSION
     PREREQ_PM         => {
@@ -25,3 +31,23 @@ WriteMakefile(
       },
     },
 );
+
+sub arguments { \%WriteMakefile }
+
+do_it() unless caller;
+sub do_it {
+	require File::Spec;
+	my $MM ='ExtUtils::MakeMaker';
+	my $MM_version =
+		eval{ "$MM " . $WriteMakefile{'CONFIGURE_REQUIRES'}{'ExtUtils::MakeMaker'} }
+			//
+		"$MM 6.64";
+	eval "use $MM_version";
+	eval "use Test::Manifest 1.21" 
+		if -e File::Spec->catfile( qw(t test_manifest) );
+	WriteMakefile( %WriteMakefile );
+	}
+
+
+no warnings;
+__PACKAGE__;

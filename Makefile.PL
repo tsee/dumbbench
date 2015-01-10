@@ -59,6 +59,8 @@ my %WriteMakefile = (
 			directory => [qw(t inc simulator xt)],
 			},
 		},
+
+	clean => { FILES => "$dist-*" },
 	);
 
 sub arguments { \%WriteMakefile }

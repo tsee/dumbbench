@@ -1,10 +1,12 @@
 use 5.0080005;
+
+package Dumbbench;
 use strict;
 use warnings;
 
 use File::Spec::Functions qw(catfile);
 
-my $module    = 'Dumbbench';
+my $module    = __PACKAGE__;
 ( my $dist = $module ) =~ s/::/-/g;
 
 my $github    = 'https://github.com/briandfoy/dumbbench';

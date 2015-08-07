@@ -3,6 +3,7 @@ bin/dumbbench
 Changes
 code.dat
 examples/TryPackage.pm
+INSTALL.SKIP
 lib/Benchmark/Dumb.pm
 lib/Dumbbench.pm
 lib/Dumbbench/BoxPlot.pm

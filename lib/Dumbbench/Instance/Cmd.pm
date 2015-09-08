@@ -17,6 +17,8 @@ use Class::XSAccessor {
   )],
 };
 
+=encoding utf8
+
 =head1 NAME
 
 Dumbbench::Instance::Cmd - Benchmarks an external command
@@ -24,13 +26,13 @@ Dumbbench::Instance::Cmd - Benchmarks an external command
 =head1 SYNOPSIS
 
   use Dumbbench;
-  
+
   my $bench = Dumbbench->new(
     target_rel_precision => 0.005, # seek ~0.5%
     initial_runs         => 20,    # the higher the more reliable
   );
   $bench->add_instances(
-    Dumbbench::Instance::Cmd->new(name => 'mauve', command => [qw(perl -e 'something')]), 
+    Dumbbench::Instance::Cmd->new(name => 'mauve', command => [qw(perl -e 'something')]),
     # ... more things to benchmark ...
   );
   $bench->run();
@@ -110,7 +112,7 @@ sub single_dry_run {
   my $self = shift;
 
   my @cmd;
-  
+
   if (defined $self->{dry_run_command}) {
     @cmd = (ref($self->{dry_run_command}) ? @{$self->{dry_run_command}} : ($self->{dry_run_command}));
   }
@@ -144,7 +146,7 @@ sub single_dry_run {
   my $duration = $end-$start;
   return $duration;
 }
- 
+
 
 1;
 

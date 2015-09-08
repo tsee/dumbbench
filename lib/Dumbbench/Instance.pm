@@ -18,6 +18,8 @@ use Class::XSAccessor {
   getters => [qw(timings dry_timings)],
 };
 
+=encoding utf8
+
 =head1 NAME
 
 Dumbbench::Instance - A benchmark instance within a Dumbbench
@@ -25,13 +27,13 @@ Dumbbench::Instance - A benchmark instance within a Dumbbench
 =head1 SYNOPSIS
 
   use Dumbbench;
-  
+
   my $bench = Dumbbench->new(
     target_rel_precision => 0.005, # seek ~0.5%
     initial_runs         => 20,    # the higher the more reliable
   );
   $bench->add_instances(
-    Dumbbench::Instance::Cmd->new(name => 'mauve', command => [qw(perl -e 'something')]), 
+    Dumbbench::Instance::Cmd->new(name => 'mauve', command => [qw(perl -e 'something')]),
     # ... more things to benchmark ...
   );
   $bench->run();
@@ -75,7 +77,7 @@ augmented in subclasses.
 sub clone {
   my $self = shift;
   my $clone = bless({%$self} => ref($self));
-  
+
   if (defined $clone->dry_result) {
     $clone->dry_result($clone->dry_result->new);
   }
@@ -145,7 +147,7 @@ sub _timings_as_histogram {
   my $self = shift;
   eval "require SOOT;";
   return() if $@;
-  
+
   my $timings = shift;
   my $is_dry  = shift;
   my $min = (@$timings ? min(@$timings)*0.95 : 0);

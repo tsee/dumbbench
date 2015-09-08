@@ -31,6 +31,8 @@ use Class::XSAccessor {
 
 use constant TOO_SMALL => 1.e-4;
 
+=encoding utf8
+
 =head1 NAME
 
 Dumbbench::Instance::PerlEval - Benchmarks a string of Perl code
@@ -38,13 +40,13 @@ Dumbbench::Instance::PerlEval - Benchmarks a string of Perl code
 =head1 SYNOPSIS
 
   use Dumbbench;
-  
+
   my $bench = Dumbbench->new(
     target_rel_precision => 0.005, # seek ~0.5%
     initial_runs         => 20,    # the higher the more reliable
   );
   $bench->add_instances(
-    Dumbbench::Instance::PerlEval->new(name => 'mauve', code => 'for(1..1e9){$i++}'), 
+    Dumbbench::Instance::PerlEval->new(name => 'mauve', code => 'for(1..1e9){$i++}'),
     # ... more things to benchmark ...
   );
   $bench->run();
@@ -102,7 +104,7 @@ sub _run {
 
   my $code = $self->$code_acc;
   $code = '' if not defined $code;
-  
+
   my $duration;
   my $n = $self->$n_loop_acc || 1;
   while (1) {
@@ -124,7 +126,7 @@ sub _run {
   return $duration / $n;
 }
 
- 
+
 
 1;
 

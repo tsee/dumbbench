@@ -21,7 +21,7 @@ our @ISA = qw(Exporter);
 our @EXPORT = ();
 our @EXPORT_OK = qw(
   timeit timethis timethese cmpthese
-  timediff timestr timesum 
+  timediff timestr timesum
 );
 our %EXPORT_TAGS = (all => [@EXPORT, @EXPORT_OK]);
 
@@ -273,7 +273,7 @@ sub timestr {
     $digits = length($1) + 1;
   }
   $rel = sprintf("\%.${digits}f", $rel);
-  
+
   my $rate = $self->_rate_str;
   my $str = "$time +- $err wallclock secs ($rel%) @ ($rate)/s (n=" . $res->nsamples . ")";
 
@@ -307,6 +307,8 @@ sub _rate {
 1;
 
 __END__
+
+=encoding utf8
 
 =head1 NAME
 

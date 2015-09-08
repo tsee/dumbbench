@@ -32,6 +32,8 @@ use Class::XSAccessor {
 
 use constant TOO_SMALL => 1.e-4;
 
+=encoding utf8
+
 =head1 NAME
 
 Dumbbench::Instance::PerlSub - Benchmarks a Perl code reference
@@ -39,13 +41,13 @@ Dumbbench::Instance::PerlSub - Benchmarks a Perl code reference
 =head1 SYNOPSIS
 
   use Dumbbench;
-  
+
   my $bench = Dumbbench->new(
     target_rel_precision => 0.005, # seek ~0.5%
     initial_runs         => 20,    # the higher the more reliable
   );
   $bench->add_instances(
-    Dumbbench::Instance::PerlSub->new(name => 'mauve', code => sub {...}), 
+    Dumbbench::Instance::PerlSub->new(name => 'mauve', code => sub {...}),
     # ... more things to benchmark ...
   );
   $bench->run();
@@ -125,7 +127,7 @@ sub _run {
   return $duration / $n;
 }
 
- 
+
 
 1;
 

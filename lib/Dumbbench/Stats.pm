@@ -92,6 +92,9 @@ sub filter_outliers {
   if (not $n_sigma) {
     return ($self->data, []);
   }
+  elsif ($n_sigma < 0) {
+    Carp::croak("A negative value for the number of 'sigmas' makes no sense");
+  }
 
   my $data = $self->data;
 

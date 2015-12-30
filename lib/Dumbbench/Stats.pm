@@ -86,12 +86,14 @@ sub filter_outliers {
   my $self = shift;
   my %opt = @_;
   my $var_measure = $opt{variability_measure} || 'mad';
-  my $n_sigma = $opt{nsigma_outliers} || 2.5;
-  my $data = $self->data;
+  my $n_sigma = $opt{nsigma_outliers};
 
-  if ($n_sigma == 0) {
-    return([@$data], []); # special case: no filtering
+  # If outlier rejection is turned off...
+  if (not $n_sigma) {
+    return ($self->data, []);
   }
+
+  my $data = $self->data;
 
   my $median = $self->median;
   my $variability = $self->$var_measure;

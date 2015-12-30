@@ -1,5 +1,7 @@
 Revision history for Perl module Dumbbench
 
+0.10  2013-12-30
+
 	* Outlier rejection claimed to be disabled when setting the
           threshold to 0. But in reality it defaulted. Now, the claim
           is true and setting the threshold to 0 "sigmas" will disable

@@ -357,7 +357,8 @@ Constructor that takes the following arguments (with defaults):
   outlier_rejection    => 3,     # no. of "sigma"s for the outlier rejection
 
 C<variability_measure> and C<outlier_rejection> probably make sense
-after reading C<HOW IT WORKS> below.
+after reading C<HOW IT WORKS> below. Setting C<outlier_rejection> to 0
+will turn it off entirely.
 
 =head2 add_instances
 

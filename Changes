@@ -1,5 +1,11 @@
 Revision history for Perl module Dumbbench
 
+	* Outlier rejection claimed to be disabled when setting the
+          threshold to 0. But in reality it defaulted. Now, the claim
+          is true and setting the threshold to 0 "sigmas" will disable
+          outlier rejection.
+	* Improved tests for outlier rejection.
+
 0.09  2013-12-30
 	* Fix for infinite loops (David Golden)
 	* Benchmarks can be taken from modules (brian d foy)

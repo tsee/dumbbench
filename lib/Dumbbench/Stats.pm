@@ -103,7 +103,7 @@ sub filter_outliers {
   my @good;
   my @outliers;
   foreach my $x (@$data) {
-    if (abs($x-$median) < $variability*$n_sigma) {
+    if (abs($x-$median) <= $variability*$n_sigma) {
       push @good, $x;
     }
     else {

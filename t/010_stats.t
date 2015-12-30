@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Test::More tests => 21;
+use Test::More tests => 26;
 use Dumbbench;
 use Dumbbench::Stats;
 
@@ -47,6 +47,23 @@ my @dev = map {abs($_-$median)} @$data;
 my $mad = Dumbbench::Stats->new(data=>\@dev)->median;
 is_approx($s->mad, $mad);
 is_approx($s->mad_dev, $mad*1.4826);
+
+SCOPE: {
+  my $s = Dumbbench::Stats->new(data => [1..5]);
+  my ($good, $bad) = $s->filter_outliers(nsigma_outliers => 0);
+  is(scalar(@$good), 5, "nsigma_outliers==0 => no rejection I");
+  is(scalar(@$bad), 0, "nsigma_outliers==0 => no rejection II");
+
+  # Median of 1..5 is 3. Std. dev of that is 1.58
+  ($good, $bad) = $s->filter_outliers(
+    nsigma_outliers => 1,
+    variability_measure => 'std_dev'
+  );
+  # The above should reject 1 and 5.
+  is(scalar(@$good), 3, "nsigma_outliers=1 I");
+  is(scalar(@$bad), 2, "nsigma_outliers=1 II");
+  ok($bad->[0] == 1 && $bad->[-1] == 5, "nsigma_outliers=1 III");
+}
 
 
 SKIP: {

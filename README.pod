@@ -71,7 +71,7 @@ the source repository:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/dumbbench>
+=item *	L<https://github.com/tsee/dumbbench>
 
 =back
 
@@ -80,7 +80,7 @@ tracker|https://github.com/briandfoy/dumbbench/issues>:
 
 =over 4
 
-=item *	L<https://github.com/briandfoy/dumbbench/issues>
+=item *	L<https://github.com/tsee/dumbbench/issues>
 
 =back
 
@@ -110,5 +110,6 @@ you wrote code that you didn't.
 Enjoy, 
 
 brian d foy, bdfoy@cpan.org
+Steffen Mueller, smueller@cpan.org
 
 =cut

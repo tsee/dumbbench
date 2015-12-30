@@ -6,8 +6,8 @@ Revision history for Perl module Dumbbench
 	* Option to output R-compatible data table (brian d foy)
 	* Example R script for making box plots from table data (brian d foy)
 	* --pin-frequency option on Linux to pin CPU frequency for
-    more consistent benchmark results.
-    (Warning: Use this option at your own risk.)
+	  more consistent benchmark results.
+	  (Warning: Use this option at your own risk.)
 
 0.08 - 2012-07-03
 	* POD fix (Eduardo Ariño de la Rubia)
@@ -27,14 +27,14 @@ Revision history for Perl module Dumbbench
 0.04 - 2010-09-21
 	* Various small but important bug fixes.
 	* Now comes with Benchmark::Dumb, an almost-Benchmark-compatible
-    interface.
+	  interface.
 	* Requires newer Number::WithError (1.00).
 	* Outlier-filtering now a feature of the statistics package.
 	* Ships with a toy-MC for simulating timing distributions.
 	* Outlier rejection now at three sigma instead of 2.5.
 	* Option to disable subtraction of dry-run timing.
 	* Iterative re-running now re-runs a fraction of the previous runs
-    to avoid frequent sorting overhead. (geometric progression)
+	  to avoid frequent sorting overhead. (geometric progression)
 
 0.03 - 2010-09-20
 	* Fixed missing dependency on parent.

@@ -32,6 +32,8 @@ Options:
  --no-dry-run      Disable subtraction of dry runs.
  --raw             Set raw output mode. Only the final count will be
                    printed to stdout.
+ --simple          Set simple output mode. Numbers will be printed in
+                   default float format instead of scientific notation.
  -s|--std          Use the standard deviation instead of the MAD as a
                    measure of variability.
  --code='code'     Benchmarks Perl code (can be specified multiple times
@@ -58,6 +60,7 @@ our $InitialTimings  = 20; # more or less arbitrary but can't be much smaller th
 our $DryRunCmd;
 our $MaxIter         = 1000;
 our $RawOutput       = 0;
+our $SimpleOutput    = 0;
 our $UseStdDeviation = 0;
 our $PlotTimings     = 0; # hidden option since virtually nobody has SOOT
 our $DataTable       = undef;
@@ -75,6 +78,7 @@ GetOptions(
   'i|initial=i'      => \$InitialTimings,
   'm|maxiter=i'      => \$MaxIter,
   'raw'              => \$RawOutput,
+  'simple'           => \$SimpleOutput,
   's|std'            => \$UseStdDeviation,
   'plot_timings'     => \$PlotTimings,
   't|table=s'        => \$DataTable,
@@ -178,7 +182,7 @@ SCOPE: {
 
 }
 
-$bench->report($RawOutput);
+$bench->report($RawOutput, $SimpleOutput);
 
 if ($PlotTimings) {
   my @src = (

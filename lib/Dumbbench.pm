@@ -240,9 +240,11 @@ sub _run {
 sub report {
   my $self = shift;
   my $raw = shift;
+  my $simple = shift;
   foreach my $instance ($self->instances) {
     my $result = $instance->result;
-    
+    my $result_str = ($simple) ? unscientific_notation($result) : "$result";
+
     if (not $raw) {
       my $mean = $result->raw_number;
       my $sigma = $result->raw_error->[0];
@@ -256,7 +258,7 @@ sub report {
       printf(
         "%sRounded run time per iteration: %s (%.1f%%)\n",
         $name,
-        "$result",
+        $result_str,
         $sigma/$mean*100
       );
       if ($self->verbosity) {
@@ -264,7 +266,7 @@ sub report {
       }
     }
     else {
-      print $result, "\n";
+      print $result_str, "\n";
     }
   }
 }
@@ -275,6 +277,10 @@ sub box_plot {
   return() if $@;
 
   return Dumbbench::BoxPlot->new($self);
+}
+
+sub unscientific_notation {
+  sprintf( "%f %s %f", split( / /, $_[0] ) );
 }
 
 1;

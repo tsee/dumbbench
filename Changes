@@ -1,5 +1,8 @@
 Revision history for Perl module Dumbbench
 
+	* --simple option for printing numbers using the default float
+	  format instead of scientific notation. (Eric Herman)
+
 0.10  2013-12-30
 
 	* Outlier rejection claimed to be disabled when setting the

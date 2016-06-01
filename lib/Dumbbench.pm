@@ -54,20 +54,20 @@ sub new {
       push @{$self->{instances}}, $instance->new;
     }
   }
-  
+
   if ($self->target_abs_precision <= 0 and $self->target_rel_precision <= 0) {
     Carp::croak("Need either target_rel_precision or target_abs_precision > 0");
   }
   if ($self->initial_runs < 6) {
     Carp::carp("Number of initial runs is very small (<6). Precision will be off.");
   }
-  
+
   return $self;
 }
 
 sub add_instances {
   my $self = shift;
-  
+
   if ($self->started) {
     Carp::croak("Can't add instances after the benchmark has been started");
   }
@@ -140,7 +140,7 @@ sub _run {
   else {
     $instance->single_run();
   }
-  
+
   my @timings;
   print "${name}Running $initial_timings initial timings...\n" if $V;
   foreach (1..$initial_timings) {
@@ -179,7 +179,7 @@ sub _run {
       $mean = 0; $sigma = 0;
       last;
     }
-    
+
     if ($n_good) {
       my $new_stats = Dumbbench::Stats->new(data => $good);
       $sigma = $new_stats->$variability_measure() / sqrt($n_good);
@@ -306,13 +306,13 @@ This will start churning for a while and then prints something like:
 As a module:
 
   use Dumbbench;
-  
+
   my $bench = Dumbbench->new(
     target_rel_precision => 0.005, # seek ~0.5%
     initial_runs         => 20,    # the higher the more reliable
   );
   $bench->add_instances(
-    Dumbbench::Instance::Cmd->new(command => [qw(perl -e 'something')]), 
+    Dumbbench::Instance::Cmd->new(command => [qw(perl -e 'something')]),
     Dumbbench::Instance::PerlEval->new(code => 'for(1..1e7){something}'),
     Dumbbench::Instance::PerlSub->new(code => sub {for(1..1e7){something}}),
   );
@@ -503,8 +503,8 @@ robust estimates of the run time of meaningless benchmarks instead.
 
 L<Dumbbench::Instance>,
 L<Dumbbench::Instance::Cmd>,
-L<Dumbbench::Instance::PerlEval>, 
-L<Dumbbench::Instance::PerlSub>, 
+L<Dumbbench::Instance::PerlEval>,
+L<Dumbbench::Instance::PerlSub>,
 L<Dumbbench::Result>
 
 L<Benchmark>

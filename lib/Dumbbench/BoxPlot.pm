@@ -48,7 +48,7 @@ sub _box_n_whisker {
   my $data = shift;
   my @names;
   $names[$_] = $data->[$_]->name || "set ".($_+1) for 0..$#$data;
-  
+
   my $npop = @$data;
   my $min = min(map $_->min, @$data);
   my $max = max(map $_->max, @$data);

@@ -32,12 +32,12 @@ sub new {
   }
   $self = $class->SUPER::new($opt{timing}, $opt{uncertainty});
   $self->{_dbr_nsamples} = $opt{nsamples};
-  
+
   return $self;
 }
 
 
 
-  
+
 
 1;

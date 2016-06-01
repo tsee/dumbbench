@@ -12,13 +12,13 @@ sub gauss {
 sub gauss_cdf {
   my ($mean, $var, $x) = @_;
 
-  # cdf from: Weisstein, Eric W. "Normal Distribution." From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/NormalDistribution.html 
+  # cdf from: Weisstein, Eric W. "Normal Distribution." From MathWorld--A Wolfram Web Resource. http://mathworld.wolfram.com/NormalDistribution.html
 
   $x = ($x-$mean)/$var;
 
   my $y = $x/sqrt(2);
 
-  # erf approximation:  ^ Winitzki, Sergei (6 February 2008). "A handy approximation for the error function and its inverse" (PDF). http://homepages.physik.uni-muenchen.de/~Winitzki/erf-approx.pdf. 
+  # erf approximation:  ^ Winitzki, Sergei (6 February 2008). "A handy approximation for the error function and its inverse" (PDF). http://homepages.physik.uni-muenchen.de/~Winitzki/erf-approx.pdf.
   use constant a => 8*(pi()-3)/(3*pi()*(4-pi()));
   my $ysq = $y*$y;
   my $erf = ($y/abs($y)) * sqrt(1. - exp( -$ysq * (4/pi() + a()*$ysq) / (1+a()*$ysq) ));
@@ -50,7 +50,7 @@ sub sigma_truncated_gauss_variance {
 
 sub truncated_gauss_variance {
   my ($mean, $var, $lower, $upper) = @_;
-  
+
   #http://en.wikipedia.org/wiki/Truncated_normal_distribution
   my $sigma = sqrt($var);
   my $rlower = ($lower-$mean)/$sigma;

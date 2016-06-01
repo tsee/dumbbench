@@ -16,6 +16,6 @@ outlier_fraction:     0.065
 outlier_offset:       1.2e-2
 outlier_jitter:       0.7e-2
 # analysis options
-variability_measure:  'mad' 
+variability_measure:  'mad'
 # reject anything further away from median
-outlier_rejection:    3. 
+outlier_rejection:    3.

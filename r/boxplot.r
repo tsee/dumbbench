@@ -3,7 +3,7 @@
 file <- commandArgs(trailingOnly=T)[1]
 print( file )
 t <- read.table(
-        file, 
+        file,
         sep="\t",
         header=T,
         fill=T

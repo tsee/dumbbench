@@ -75,12 +75,12 @@ SKIP: {
   $hist->FillRandom("g", 1e5);
   #$hist->Draw();
   #$SOOT::gApplication->Run();
-  
+
   my @d;
   foreach (1..1e4) {
     push @d, $hist->GetRandom();
   }
-  
+
   my $s = Dumbbench::Stats->new(data => \@d);
   is_approx($s->mean, 20, 0.1);
   is_approx($s->median, 20, 0.1);

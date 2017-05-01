@@ -394,6 +394,18 @@ Returns a list of all instance objects in this benchmark set.
 The instance objects each have a C<result()> and C<dry_result()>
 method for accessing the numeric benchmark results.
 
+=head2 box_plot
+
+Returns a L<Dumbbench::BoxPlot> instance.
+
+A L<Dumbbench::BoxPlot> is a nice an easy way to get a graphic chart if
+you're in the mood instead of getting the same results from C<report>.
+
+If you don't want to get into the details of L<Dumbbench::BoxPlot>, you can do:
+
+  # $bench is your Dumbbench instance
+  $bench->box_plot->show;
+
 =head1 HOW IT WORKS AND WHY IT DOESN'T
 
 =head2 Why it doesn't work and why we try regardless

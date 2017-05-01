@@ -62,6 +62,21 @@ You could install just this module manually:
 You probably don't want to do that unless you're fiddling with the
 module and only want to run the tests without installing anything.
 
+=head3 Dumbbench::BoxPlot install
+
+If you want to use L<Dumbbench::BoxPlot> (check it's Pod for details), you will need to add
+more software than is initially required to just run Dumbbench.
+
+First, you need to provide development headers for the L<ROOT|https://root.cern.ch> application. How to install
+depends on your operational system requirements. For Ubuntu 16.04, installing the following packages will do:
+
+    sudo apt-get install libroot-gui-dev libroot-graf3d-g3d-dev libroot-graf3d-gl-dev libroot-graf2d-postscript-dev libroot-math-physics-dev
+
+After that, you will need to install the L<SOOT> distribution, which provides a Perl binding for L<ROOT|https://root.cern.ch>. Once you
+have the required development headers and libraries, you just need to repeate the same steps already described for installing Dumbbench:
+
+    % cpanm SOOT
+
 =head2 Source location
 
 The meta data, such as the source repository and bug tracker, is in

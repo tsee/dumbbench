@@ -2,6 +2,14 @@
 
 =encoding utf8
 
+=for HTML <a href="https://travis-ci.org/tsee/dumbbench"><img src="https://travis-ci.org/tsee/dumbbench.svg?branch=master"></a>
+
+=for HTML <a href='https://coveralls.io/github/tsee/dumbbench?branch=master'><img src='https://coveralls.io/repos/github/tsee/dumbbench/badge.svg?branch=master' alt='Coverage Status' /></a>
+
+=for HTML <a href="https://github.com/tsee/dumbbench/blob/master/LICENSE"><img src="https://img.shields.io/cpan/l/Dumbbench.svg" /></a>
+
+=for HTML <a href="http://www.metacpan.org/module/Dumbbench"><img src="https://img.shields.io/cpan/v/Dumbbench.svg" /></A>
+
 =head1 The Dumbbench module
 
 This is the I<README> for the L<Dumbbench> Perl module. You're probably

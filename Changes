@@ -1,5 +1,8 @@
 Revision history for Perl module Dumbbench
 
+0.10_01 2017-06-07T22:17:26Z
+	* Bump to test version to see what CPAN Testers says
+
 	* --simple option for printing numbers using the default float
 	  format instead of scientific notation. (Eric Herman)
 

@@ -91,7 +91,7 @@ the source repository:
 =back
 
 If you find a problem, file a ticket in the L<issue
-tracker|https://github.com/briandfoy/dumbbench/issues>:
+tracker|https://github.com/tsee/dumbbench/issues>:
 
 =over 4
 
